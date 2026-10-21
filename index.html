@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub Actions</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f4f6f9; --grid:#dce3ee; --ink:#1b2230; --muted:#5b6577; --blue:#2552c9; --green:#13795b; --sticky:#ffe76a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; color: var(--ink); font-size: 18px; line-height: 1.5;
+    background: var(--paper) linear-gradient(var(--grid) 1px, transparent 1px) -1px -1px / 40px 40px,
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px) -1px -1px / 40px 40px; }
+  main { max-width: 1120px; margin: 0 auto; padding: 64px 28px 80px; }
+  h1 { font: 800 clamp(44px, 7vw, 80px)/0.95 'Bricolage Grotesque', sans-serif; letter-spacing: -0.03em; margin: 0 0 16px; }
+  .lede { max-width: 60ch; color: var(--muted); font-size: 20px; margin: 0 0 48px; }
+  .lectures { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; }
+  section { background: #fff; border: 2px solid var(--ink); border-radius: 4px; padding: 28px; }
+  .num { font: 800 64px/1 'Bricolage Grotesque', sans-serif; color: var(--blue); }
+  h2 { font: 800 30px/1.1 'Bricolage Grotesque', sans-serif; margin: 8px 0 6px; letter-spacing: -0.01em; }
+  section > p { margin: 0 0 22px; color: var(--muted); }
+  a.slides { display: block; background: var(--sticky); color: var(--ink); text-decoration: none; padding: 20px 22px; margin-bottom: 18px;
+    transform: rotate(-0.8deg); box-shadow: 0 10px 18px -10px rgb(27 34 48 / 0.45); transition: transform .15s; }
+  a.slides:hover, a.slides:focus-visible { transform: rotate(0deg) translateY(-2px); }
+  a.slides b { display: block; font: 800 26px 'Bricolage Grotesque', sans-serif; }
+  ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  ol a { display: block; padding: 14px 16px; border: 2px solid var(--grid); border-radius: 4px; color: var(--ink); text-decoration: none; }
+  ol a:hover, ol a:focus-visible { border-color: var(--blue); }
+  ol a b { color: var(--blue); }
+  ol a span { display: block; color: var(--muted); font-size: 16px; }
+  h3 { font: 800 26px 'Bricolage Grotesque', sans-serif; margin: 56px 0 14px; }
+  .kit { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .kit a { background: #fff; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .gallery figure { margin: 0; background: #fff; border: 2px solid var(--grid); border-radius: 4px; padding: 8px; }
+  .gallery img { width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top; display: block; }
+  .gallery figcaption { font-size: 15px; padding: 6px 2px 0; display: flex; justify-content: space-between; gap: 8px; }
+  .gallery figcaption a { color: var(--blue); }
+  .install { margin-bottom: 20px; }
+  .install h4 { font: 800 21px 'Bricolage Grotesque', sans-serif; margin: 28px 0 6px; }
+  .install h4:first-child { margin-top: 0; }
+  .install .steps { display: block; list-style: decimal; padding-left: 1.4em; margin: 0 0 14px; }
+  .install .steps li::marker { font-weight: 700; color: var(--blue); } .install .steps li { margin-bottom: 12px; }
+  .os { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+  .os h5 { font: 700 17px 'Bricolage Grotesque', sans-serif; margin: 6px 0 4px; }
+  @media (max-width: 760px) { .os { grid-template-columns: 1fr; } }
+  .install code { font-size: 0.9em; background: #e8ecf3; padding: 1px 5px; border-radius: 3px; }
+  .cmdwrap { position: relative; margin: 8px 0 6px; }
+  pre.cmd { background: var(--ink); color: #fff; padding: 16px 18px; padding-right: 90px; border-radius: 4px; overflow-x: auto; margin: 0; font-size: 15px; }
+  pre.cmd code { background: none; padding: 0; }
+  .copy { position: absolute; top: 10px; right: 10px; font: 700 14px 'Atkinson Hyperlegible'; padding: 6px 12px; border-radius: 4px; border: 0; background: var(--sticky); color: var(--ink); cursor: pointer; }
+  .fail { margin: 0 0 8px; padding: 14px 18px; background: var(--sticky); transform: rotate(-0.4deg); }
+  .install .steps a, details a { display: inline; padding: 0; border: 0; color: var(--blue); text-decoration: underline; }
+  details { margin: 6px 0 14px; }
+  summary { cursor: pointer; font-weight: 700; color: var(--blue); }
+  footer { margin-top: 56px; color: var(--muted); font-size: 16px; }
+  a:focus-visible, summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { a.slides { transition: none; } }
+  .install table { border-collapse: collapse; background: #fff; margin: 10px 0; font-size: 15px; display: block; overflow-x: auto; max-width: 100%; }
+  .install th, .install td { border: 1px solid var(--grid); padding: 6px 10px; text-align: left; }
+</style>
+</head>
+<body>
+<main>
+  <h1>GitHub Actions</h1>
+  <p class="lede">Stop relying on memory: let GitHub run your tests on every push and pull request. Lecture 1 builds and watches your first workflow; Lecture 2 runs your Jest suite on dev and on pull requests, by hand, and inside Docker. You'll push to your own GitHub repos, so be logged in to github.com. Everything opens in a new tab, so keep this page open as your home base.</p>
+
+  <div class="lectures">
+    <section>
+      <div class="num">1</div>
+      <h2>Intro to Workflows</h2>
+      <p>Event → Workflow → Job → Steps. Why CI, the Marketplace, YAML in three rules, your first workflow and the Actions tab, and triggers: branches, pull requests, schedules.</p>
+      <a class="slides" href="lecture-1-intro-to-workflows/slides.html" target="_blank" rel="noopener"><b>Open the slides</b>Arrow keys to move, F for fullscreen</a>
+      <ol>
+        <li><a href="lecture-1-intro-to-workflows/code-lab/" target="_blank" rel="noopener"><b>Code Lab 1</b><span>Your hello-actions repo, step by step, with what the Actions tab shows.</span></a></li>
+        <li><a href="lecture-1-intro-to-workflows/activity-will-it-run/" target="_blank" rel="noopener"><b>Activity: Will it run?</b><span>An on: block and an event. RUNS or DOESN'T RUN?</span></a></li>
+      </ol>
+    </section>
+    <section>
+      <div class="num">2</div>
+      <h2>Managing Workflows</h2>
+      <p>A workflow that runs the Jest suite on dev and on pull requests into main, reading a red run, manual runs with workflow_dispatch, workflows as code, and the Docker version.</p>
+      <a class="slides" href="lecture-2-managing-workflows/slides.html" target="_blank" rel="noopener"><b>Open the slides</b>Arrow keys to move, F for fullscreen</a>
+      <ol>
+        <li><a href="lecture-2-managing-workflows/code-lab/" target="_blank" rel="noopener"><b>Code Lab 2</b><span>The ci-factorial project: local test, dev branch, a red run, a pull request, Docker.</span></a></li>
+        <li><a href="lecture-2-managing-workflows/activity-read-the-red-x/" target="_blank" rel="noopener"><b>Activity: Read the red ✗</b><span>Real failed runs. Test failed, broken YAML, or a missing step?</span></a></li>
+      </ol>
+    </section>
+  </div>
+
+  <ol class="kit" style="margin-top:0">
+    <li><a href="https://github.com/kabeier/gh-actions-demo/actions" target="_blank" rel="noopener"><b>The demo repo's runs</b><span>Every workflow from both lessons, run for real: green ones, red ones, and the pull request.</span></a></li>
+  </ol>
+
+  <h3 id="homework">Homework Part I: Hello Workflows</h3>
+  <section class="install">
+    <p>Start a <b>new repository</b> with one workflow that: runs on <b>every push, on all branches</b> · sets up <b>Ubuntu</b> · uses a shell command to <b>echo Hello Workflows</b>. Then 50 steps of your current <b>FreeCodeCamp</b> certification.</p>
+    <h4>1 · The repo and the workflow</h4>
+    <ol class="steps">
+      <li>New public repo on github.com (no README), then <code>mkdir</code> it, <code>git init</code>, <code>mkdir -p .github/workflows</code>, <code>code .</code> (Code Lab 1, section 1).</li>
+      <li><code>.github/workflows/hello-workflows.yml</code>. Try writing it yourself from Lecture 1 first; then compare:
+        <details><summary>Show a working version</summary><div class="cmdwrap"><pre class="cmd"><code>name: Hello Workflows
+
+on:
+  push:
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say hello
+        run: echo &quot;Hello Workflows&quot;</code></pre><button type="button" class="copy">Copy</button></div></details></li>
+      <li>Commit, push to main, then push a second branch: it should run on <b>both</b>.
+        <div class="cmdwrap"><pre class="cmd"><code>git add .
+git commit -m &quot;Hello Workflows&quot;
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
+git push -u origin main</code></pre><button type="button" class="copy">Copy</button></div>
+        <p class="fail"><b>Done</b> = a green ✓ in the Actions tab, and "Hello Workflows" printed in the step's output. <b>If this breaks:</b> no run at all = check the folder is exactly <code>.github/workflows/</code>. "Invalid workflow file" = indentation (spaces, not tabs).</p></li>
+    </ol>
+  </section>
+
+  <h3>Homework Part II: Adding Workflows</h3>
+  <section class="install">
+    <p>Go back to every assignment you've done that has a <b>test suite</b> and add a workflow that runs it. That's the pytest and Jest assignments: Roman Numerals and Linear Search (pytest), Fibonacci and Linear Search (Jest), Test my Calculator (pytest). Then 50 steps of your current <b>FreeCodeCamp</b> certification.</p>
+    <h4>2 · Jest repos</h4>
+    <ol class="steps">
+      <li>In each Jest repo (they already list Jest in package.json): <code>.github/workflows/run-jest.yml</code>
+        <div class="cmdwrap"><pre class="cmd"><code>name: Run Jest Tests
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test</code></pre><button type="button" class="copy">Copy</button></div></li>
+    </ol>
+    <h4>3 · pytest repos</h4>
+    <ol class="steps">
+      <li>In each pytest repo: <code>.github/workflows/run-pytest.yml</code>
+        <div class="cmdwrap"><pre class="cmd"><code>name: Run pytest
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: &quot;3.12&quot;
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run tests
+        run: pytest</code></pre><button type="button" class="copy">Copy</button></div>
+        <code>setup-python</code> gives you Python, <b>not</b> pytest: keep the <code>pip install pytest</code> step.</li>
+    </ol>
+    <h4>4 · Push and check</h4>
+    <ol class="steps">
+      <li>Commit and push each repo:
+        <div class="cmdwrap"><pre class="cmd"><code>git add .github
+git commit -m &quot;Run the tests in GitHub Actions&quot;
+git push</code></pre><button type="button" class="copy">Copy</button></div>
+        <b>Or ask Claude</b> (in the repo folder):
+        <div class="cmdwrap"><pre class="cmd" style="white-space:pre-wrap"><code>Run git status and show me the list of files. Then suggest a commit message for adding a GitHub Actions workflow and wait for my approval. After I approve, commit and push to my fork.</code></pre><button type="button" class="copy">Copy</button></div></li>
+      <li><b>Done</b> = each repo's Actions tab shows a run. Green ✓ if your solution passes; red ✗ if a test fails (that's the workflow doing its job: read the log).
+        <p class="fail"><b>If this breaks:</b> <code>pytest: command not found</code> = missing <code>pip install pytest</code>. <code>jest: not found</code> = run <code>npm install</code> (or add Jest). <code>ENOENT … package.json</code> = missing <code>actions/checkout</code>. Both templates ran green in the demo repo (branches template-jest and template-pytest).</p></li>
+    </ol>
+  </section>
+
+  <ol class="kit">
+    <li><a href="https://github.com/kabeier/intro-github-actions/blob/main/demo-kit/RUNBOOK.md" target="_blank" rel="noopener"><b>Runbook</b><span>Before class, per-slide Do/Say, time checks, the demo repo as backup.</span></a></li>
+    <li><a href="https://github.com/kabeier/intro-github-actions/blob/main/demo-kit/prompts.md" target="_blank" rel="noopener"><b>Files and commands</b><span>Every workflow and command from both lectures, the homework templates, the Claude prompt.</span></a></li>
+    <li><a href="https://github.com/kabeier/gh-actions-demo" target="_blank" rel="noopener"><b>kabeier/gh-actions-demo</b><span>The lesson's project with both workflows, PR #1, and example branches that fail on purpose.</span></a></li>
+    <li><a href="https://codeplatoon.github.io/se-curriculum/phase-I/01-Fundamentals/5-github-actions/" target="_blank" rel="noopener"><b>The curriculum</b><span>GitHub Actions overview, both lessons and the assignments page.</span></a></li>
+  </ol>
+
+  <h3>Diagrams</h3>
+  <div class="gallery" id="gallery"></div>
+
+  <footer>Want to edit a diagram? Download its .tldr file and drag it onto <a href="https://www.tldraw.com" target="_blank" rel="noopener">tldraw.com</a>. Earlier lectures: <a href="https://kabeier.github.io/intro-tdd/" target="_blank" rel="noopener">Test Driven Development</a> · <a href="https://kabeier.github.io/intro-js-py/" target="_blank" rel="noopener">JavaScript and Python</a> · <a href="https://kabeier.github.io/intro-docker/" target="_blank" rel="noopener">Docker</a> · <a href="https://kabeier.github.io/SPAs-and-Claude/" target="_blank" rel="noopener">SPAs and Claude</a> · <a href="https://kabeier.github.io/Databases-and-Supabase/" target="_blank" rel="noopener">Databases and Supabase</a> · <a href="https://kabeier.github.io/Claude-and-full-stack-apps/" target="_blank" rel="noopener">Full-Stack Apps</a> · <a href="https://kabeier.github.io/Claude-and-auth/" target="_blank" rel="noopener">Authentication</a>.</footer>
+</main>
+<script>
+  document.querySelectorAll('.copy').forEach((b) => b.onclick = async () => {
+    await navigator.clipboard.writeText(b.previousElementSibling.innerText.trim()); b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 1500)
+  })
+  const DIAGRAMS = [
+    ['GA1-01-event-to-steps', 'Event → Workflow → Job → Steps'], ['GA1-02-what-happens', 'What happens when you push'],
+    ['GA2-01-run-tests-plain', 'run-tests.yml in plain English'], ['GA2-02-dev-pr-main', 'dev → pull request → main'],
+    ['GA2-03-native-vs-docker', 'Native vs Docker in CI'],
+  ]
+  document.getElementById('gallery').innerHTML = DIAGRAMS.map(([f, t]) => `
+    <figure><a href="diagrams/${f}.png" target="_blank" rel="noopener"><img src="diagrams/${f}.png" alt="${t}" loading="lazy"></a>
+    <figcaption>${t}<a href="diagrams/${f}.tldr" download>.tldr</a></figcaption></figure>`).join('')
+</script>
+</body>
+</html>

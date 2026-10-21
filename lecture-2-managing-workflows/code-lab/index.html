@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Lab 2 · Managing Workflows</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f4f6f9; --grid:#dce3ee; --ink:#1b2230; --muted:#5b6577; --blue:#2552c9; --green:#13795b; --sticky:#ffe76a; --red:#b3261e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; color: var(--ink); font-size: 18px; line-height: 1.55;
+    background: var(--paper) linear-gradient(var(--grid) 1px, transparent 1px) -1px -1px / 40px 40px,
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px) -1px -1px / 40px 40px; }
+  main { max-width: 900px; margin: 0 auto; padding: 48px 28px 80px; }
+  .back { color: var(--blue); font-weight: 700; }
+  h1 { font: 800 clamp(40px, 6vw, 64px)/0.98 'Bricolage Grotesque', sans-serif; letter-spacing: -0.03em; margin: 18px 0 14px; }
+  .lede { color: var(--muted); font-size: 20px; margin: 0 0 28px; max-width: 62ch; }
+  h2 { font: 800 28px/1.15 'Bricolage Grotesque', sans-serif; margin: 0 0 10px; }
+  h3 { font: 800 21px 'Bricolage Grotesque', sans-serif; margin: 26px 0 6px; }
+  section { background: #fff; border: 2px solid var(--ink); border-radius: 4px; padding: 28px; margin-bottom: 28px; }
+  section > p { margin: 0 0 14px; }
+  .choose { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .choose a { display: block; background: #fff; border: 2px solid var(--grid); border-radius: 4px; padding: 16px 18px; color: var(--ink); text-decoration: none; }
+  .choose a:hover, .choose a:focus-visible { border-color: var(--blue); }
+  .choose b { display: block; color: var(--blue); font-size: 20px; }
+  .choose span { color: var(--muted); font-size: 16px; }
+  @media (max-width: 700px) { .choose { grid-template-columns: 1fr; } }
+  ol.steps { padding-left: 1.4em; margin: 0 0 8px; }
+  ol.steps > li { margin-bottom: 14px; }
+  ol.steps > li::marker { font-weight: 700; color: var(--blue); }
+  code { font-size: 0.9em; background: #e8ecf3; padding: 1px 5px; border-radius: 3px; }
+  .cmdwrap { position: relative; margin: 8px 0 6px; }
+  pre.cmd { background: var(--ink); color: #fff; padding: 16px 18px; padding-right: 90px; border-radius: 4px; overflow-x: auto; margin: 0; font-size: 15px; }
+  pre.cmd code { background: none; padding: 0; }
+  pre.json { max-height: 420px; }
+  pre.pic { background: #fff; border: 2px solid var(--grid); border-radius: 4px; padding: 14px 18px; overflow-x: auto; font-size: 15px; margin: 8px 0 14px; }
+  .copy { position: absolute; top: 10px; right: 10px; font: 700 14px 'Atkinson Hyperlegible'; padding: 6px 12px; border-radius: 4px; border: 0; background: var(--sticky); color: var(--ink); cursor: pointer; }
+  .note { margin: 10px 0 0; padding: 14px 18px; background: var(--sticky); transform: rotate(-0.4deg); }
+  .req { border: 2px solid var(--grid); border-radius: 4px; padding: 16px 18px; margin: 14px 0; }
+  .req h3 { margin: 0 0 8px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .method { font: 700 15px 'Atkinson Hyperlegible'; color: #fff; background: var(--blue); padding: 2px 8px; border-radius: 3px; }
+  .method.post { background: var(--green); }
+  .req dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+  .req dt { font-weight: 700; color: var(--muted); }
+  .req dd { margin: 0; overflow-wrap: anywhere; }
+  .expect { color: var(--green); font-weight: 700; }
+  .bad { color: var(--red); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { font-size: 15px; color: var(--muted); }
+  .dl { display: inline-block; background: var(--sticky); color: var(--ink); font-weight: 700; text-decoration: none; padding: 12px 18px; border-radius: 4px; margin: 4px 0 10px; }
+  details { margin-top: 10px; } summary { cursor: pointer; font-weight: 700; color: var(--blue); }
+  a { color: var(--blue); }
+  a:focus-visible, summary:focus-visible, .copy:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  pre.see { background: #fff; border: 2px solid var(--grid); border-left: 8px solid var(--green); border-radius: 4px; padding: 12px 16px; overflow-x: auto; font-size: 15px; margin: 6px 0 12px; }
+  pre.see .e { color: var(--red); white-space: pre-wrap; }
+  .label { font-weight: 700; color: var(--green); font-size: 15px; margin-top: 6px; }
+  .os { display: grid; grid-template-columns: 1fr; gap: 0 20px; }
+  .os h4 { margin: 6px 0 2px; font-size: 16px; }
+  @media (max-width: 700px) { .os { grid-template-columns: 1fr; } }
+  section h2 .n { color: var(--blue); }
+  td code { overflow-wrap: anywhere; }
+  .os > div, ol.steps > li { min-width: 0; }
+  @media (max-width: 700px) { table { display: block; overflow-x: auto; } section { padding: 18px; } }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="../../">← GitHub Actions home</a>
+  <h1>Code Lab 2: run your tests on every push</h1>
+  <p class="lede">Follow along with Lecture 2. You'll set up the lesson's project, prove it works locally, then have GitHub run the Jest suite on <code>dev</code> and on pull requests, by hand, and in Docker. Every result below came from a real run in <a href="https://github.com/kabeier/gh-actions-demo/actions" target="_blank" rel="noopener">kabeier/gh-actions-demo</a>.</p>
+
+  <div class="choose">
+    <a href="#s1"><b>In class</b><span>Sections 1–7 follow the slides.</span></a>
+    <a href="#breaks"><b>Something broke?</b><span>Jump to the table at the bottom.</span></a>
+  </div>
+
+  <section id="s1">
+    <h2><span class="n">1 ·</span> The project, and does it work locally?</h2>
+    <ol class="steps">
+      <li>On github.com, a new <b>Public</b> repo <code>ci-factorial</code>, no README. Then:
+        <div class="cmdwrap"><pre class="cmd"><code>mkdir ci-factorial
+cd ci-factorial
+git init
+code .</code></pre><button type="button" class="copy">Copy</button></div></li>
+      <li>Make these four files (the lesson's, word for word) and a <code>.gitignore</code>:
+        <p class="label">index.js</p><div class="cmdwrap"><pre class="cmd"><code>function factorial(num) {
+  let product = 1;
+
+  for (let i = num; i &gt; 0; i--) {
+    product = product * i;
+  }
+
+  return product;
+}
+
+module.exports = factorial;</code></pre><button type="button" class="copy">Copy</button></div>
+        <p class="label">main.test.js</p><div class="cmdwrap"><pre class="cmd"><code>const factorial = require(&quot;./index.js&quot;);
+
+describe(&quot;tests factorial for small numbers&quot;, () =&gt; {
+  test(&quot;tests factorial(0) = 1&quot;, () =&gt; {
+    expect(factorial(0)).toBe(1);
+  });
+
+  test(&quot;tests factorial(1) = 1&quot;, () =&gt; {
+    expect(factorial(1)).toBe(1);
+  });
+
+  test(&quot;tests factorial(2) = 2&quot;, () =&gt; {
+    expect(factorial(2)).toBe(2);
+  });
+
+  test(&quot;tests factorial(3) = 6&quot;, () =&gt; {
+    expect(factorial(3)).toBe(6);
+  });
+});
+
+describe(&quot;tests factorial for large numbers&quot;, () =&gt; {
+  test(&quot;tests factorial(10) = 3628800&quot;, () =&gt; {
+    expect(factorial(10)).toBe(3628800);
+  });
+
+  test(&quot;tests factorial(20) = 2432902008176640000&quot;, () =&gt; {
+    expect(factorial(20)).toBe(2432902008176640000);
+  });
+
+  test(&quot;tests factorial(40) = 8.15915283247898e47&quot;, () =&gt; {
+    expect(factorial(40)).toBe(8.15915283247898e47);
+  });
+});</code></pre><button type="button" class="copy">Copy</button></div>
+        <p class="label">package.json</p><div class="cmdwrap"><pre class="cmd"><code>{
+  &quot;name&quot;: &quot;trial&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;&quot;,
+  &quot;main&quot;: &quot;index.js&quot;,
+  &quot;scripts&quot;: {
+    &quot;test&quot;: &quot;jest&quot;
+  },
+  &quot;keywords&quot;: [],
+  &quot;author&quot;: &quot;&quot;,
+  &quot;license&quot;: &quot;ISC&quot;,
+  &quot;type&quot;: &quot;commonjs&quot;
+}</code></pre><button type="button" class="copy">Copy</button></div>
+        <p class="label">Dockerfile</p><div class="cmdwrap"><pre class="cmd"><code>FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+RUN npm install --save-dev jest
+
+COPY . .
+
+CMD [&quot;npm&quot;, &quot;test&quot;]</code></pre><button type="button" class="copy">Copy</button></div>
+        <p class="label">.gitignore</p><div class="cmdwrap"><pre class="cmd"><code>node_modules</code></pre><button type="button" class="copy">Copy</button></div></li>
+      <li>Run the tests:
+        <div class="cmdwrap"><pre class="cmd"><code>npm test</code></pre><button type="button" class="copy">Copy</button></div>
+        <pre class="see">&gt; trial@1.0.0 test
+&gt; jest
+
+sh: jest: command not found</pre>
+        The lesson's package.json doesn't list Jest. Install it, then run again:
+        <div class="cmdwrap"><pre class="cmd"><code>npm install --save-dev jest
+npm test</code></pre><button type="button" class="copy">Copy</button></div>
+        <pre class="see"> PASS  ./main.test.js
+  tests factorial for small numbers
+    ✓ tests factorial(0) = 1
+    ✓ tests factorial(1) = 1
+    ✓ tests factorial(2) = 2
+    ✓ tests factorial(3) = 6
+  tests factorial for large numbers
+    ✓ tests factorial(10) = 3628800
+    ✓ tests factorial(20) = 2432902008176640000
+    ✓ tests factorial(40) = 8.15915283247898e47
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total</pre></li>
+    </ol>
+  </section>
+
+  <section id="s2">
+    <h2><span class="n">2 ·</span> Push main</h2>
+    <div class="cmdwrap"><pre class="cmd"><code>git add .
+git commit -m &quot;Factorial project&quot;
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/ci-factorial.git
+git push -u origin main</code></pre><button type="button" class="copy">Copy</button></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="n">3 ·</span> run-tests.yml on a dev branch</h2>
+    <p>Create <code>.github/workflows/run-tests.yml</code> (the lesson's):</p>
+    <div class="cmdwrap"><pre class="cmd"><code>name: Run Test Suite
+
+on:
+  push:
+    branches:
+      - dev
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Jest
+        run: npm install jest
+
+      - name: Run tests
+        run: |
+          npm test || (echo &quot;❌ Tests failed&quot; &amp;&amp; exit 1)</code></pre><button type="button" class="copy">Copy</button></div>
+    <div class="cmdwrap"><pre class="cmd"><code>git checkout -b dev
+git add .
+git commit -m &quot;Run tests in CI&quot;
+git push -u origin dev</code></pre><button type="button" class="copy">Copy</button></div>
+    <p>Actions tab → <b>Run Test Suite</b> → the run → <b>test</b> → <b>Run tests</b>:</p>
+    <pre class="see">✓ Checkout repository
+✓ Set up Node.js
+✓ Install dependencies
+✓ Install Jest            npm warn EBADENGINE …   ← warnings, not errors
+✓ Run tests
+    &gt; trial@1.0.0 test
+    &gt; jest
+    PASS ./main.test.js
+    …
+    Tests:       7 passed, 7 total</pre>
+    <p class="note">The yellow <code>npm warn EBADENGINE</code> lines: today's Jest prefers Node 20+. The run is still green. <code>node-version: 20</code> makes them go away.</p>
+  </section>
+
+  <section id="s4">
+    <h2><span class="n">4 ·</span> Break a test, read the red ✗</h2>
+    <p>In main.test.js, change <code>expect(factorial(3)).toBe(6);</code> to <code>toBe(7)</code>, then:</p>
+    <div class="cmdwrap"><pre class="cmd"><code>git commit -am &quot;Break a test&quot;
+git push</code></pre><button type="button" class="copy">Copy</button></div>
+    <pre class="see">FAIL ./main.test.js
+  ✕ tests factorial(3) = 6
+
+  ● tests factorial for small numbers › tests factorial(3) = 6
+
+    Expected: 7
+    Received: 6
+
+Tests:       1 failed, 6 passed, 7 total
+❌ Tests failed
+Error: Process completed with exit code 1.</pre>
+    <p>Change it back to <code>toBe(6)</code>, commit, push: green again.</p>
+  </section>
+
+  <section id="s5">
+    <h2><span class="n">5 ·</span> A pull request into main</h2>
+    <ol class="steps">
+      <li>On github.com: <b>Compare &amp; pull request</b> (base: <b>main</b> ← compare: <b>dev</b>) → <b>Create pull request</b>.</li>
+      <li>At the bottom of the PR, the <b>Run Test Suite</b> check runs (event: pull_request). Wait for ✓, then <b>Merge pull request</b>.</li>
+      <li>The merge is a push to main: Run Test Suite does <b>not</b> run for it (its push trigger is dev only).</li>
+    </ol>
+    <p class="note">Want a red check to actually block merging? Settings → Branches → add a rule for main → require status checks to pass.</p>
+  </section>
+
+  <section id="s6">
+    <h2><span class="n">6 ·</span> Run it by hand: workflow_dispatch</h2>
+    <p>Add <code>workflow_dispatch:</code> under <code>on:</code> (lined up with <code>push:</code>). Once that's on main, the workflow's page gets a <b>Run workflow</b> button. Every finished run also has <b>Re-run all jobs</b>.</p>
+    <p class="note">Without the trigger, a manual start is refused: <code>Workflow does not have 'workflow_dispatch' trigger</code>.</p>
+  </section>
+
+  <section id="s7">
+    <h2><span class="n">7 ·</span> The Docker version</h2>
+    <p>Replace run-tests.yml with the lesson's Docker version. The runner already has Docker; your Dockerfile installs Node and Jest:</p>
+    <div class="cmdwrap"><pre class="cmd"><code>name: Run Test Suite
+
+on:
+  push:
+    branches:
+      - dev
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t app-test .
+
+      - name: Run tests in container
+        run: docker run app-test</code></pre><button type="button" class="copy">Copy</button></div>
+    <div class="cmdwrap"><pre class="cmd"><code>git checkout dev
+git commit -am &quot;Run the tests in Docker&quot;
+git push</code></pre><button type="button" class="copy">Copy</button></div>
+    <pre class="see">✓ Checkout repository
+✓ Build Docker image
+✓ Run tests in container
+    &gt; trial@1.0.0 test
+    &gt; jest
+    PASS ./main.test.js
+    Tests:       7 passed, 7 total</pre>
+  </section>
+
+  <section>
+    <h2>Check: you're done when…</h2>
+    <ol class="steps">
+      <li>Your repo has a red ✗ run (the broken test) followed by a green ✓ run</li>
+      <li>Your pull request shows a passing Run Test Suite check, and it's merged</li>
+      <li>The Docker version is green</li>
+    </ol>
+  </section>
+
+  <section id="breaks">
+    <h2>When something breaks</h2>
+    <table>
+      <tr><th>Failed step / message</th><th>It means</th><th>Fix</th></tr>
+      <tr><td><b>Install dependencies:</b> <code>npm error code ENOENT … package.json</code> (exit 254)</td><td>The code was never copied onto the runner</td><td>First step: <code>uses: actions/checkout@v4</code></td></tr>
+      <tr><td><b>Run tests:</b> <code>sh: 1: jest: not found</code> (exit 127)</td><td>Jest isn't installed on the runner</td><td>Keep the <code>npm install jest</code> step (or list Jest in package.json)</td></tr>
+      <tr><td><b>Build Docker image:</b> <code>failed to read dockerfile: open Dockerfile: no such file or directory</code></td><td>No checkout, or no Dockerfile in the repo</td><td>Checkout first; commit the Dockerfile</td></tr>
+      <tr><td><code>Invalid workflow file … yaml syntax on line N</code></td><td>Indentation or a tab</td><td>Spaces only, keys lined up</td></tr>
+      <tr><td>Run Test Suite didn't run</td><td>You pushed to a branch it doesn't watch</td><td>It runs on pushes to <b>dev</b> and PRs into <b>main</b></td></tr>
+      <tr><td>No "Run workflow" button</td><td>No <code>workflow_dispatch</code>, or it isn't on main yet</td><td>Add it under <code>on:</code>, merge to main</td></tr>
+    </table>
+  </section>
+
+</main>
+<script>
+  document.querySelectorAll('.copy').forEach((b) => b.onclick = async () => {
+    await navigator.clipboard.writeText(b.previousElementSibling.innerText.trim()); b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 1500)
+  })
+</script>
+</body>
+</html>

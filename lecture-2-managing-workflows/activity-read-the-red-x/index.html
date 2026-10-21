@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Read the red X · Managing Workflows</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f4f6f9; --grid:#dce3ee; --ink:#1b2230; --muted:#5b6577; --blue:#2552c9; --green:#13795b; --red:#c8372d; --sticky:#ffe76a; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; color: var(--ink); display: grid; grid-template-rows: auto auto 1fr auto;
+    background: var(--paper) linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 40px 40px,
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 40px 40px; }
+  header { padding: 20px 36px 0; display: flex; justify-content: space-between; align-items: baseline; gap: 20px; }
+  h1 { font: 800 40px 'Bricolage Grotesque', sans-serif; margin: 0; letter-spacing: -0.02em; }
+  .count { font: 700 20px 'JetBrains Mono', monospace; color: var(--muted); }
+  .bank { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 36px 0; }
+  .bank button { font: 700 22px 'JetBrains Mono', monospace; background: #fff; border: 2px solid var(--ink); border-radius: 6px; padding: 8px 18px; cursor: pointer; color: var(--ink); }
+  .bank button.hit { background: var(--green); border-color: var(--green); color: #fff; }
+  .bank button.miss { background: var(--red); border-color: var(--red); color: #fff; }
+  .bank .legend { align-self: center; font-size: 16px; color: var(--muted); margin-left: 8px; }
+  .stagearea { display: grid; place-items: center; padding: 20px 36px; }
+  .card { width: min(1100px, 100%); background: var(--sticky); padding: 48px 56px; transform: rotate(-1deg);
+    box-shadow: 0 18px 30px -12px rgb(27 34 48 / 0.35); }
+  .who { font: 700 18px 'JetBrains Mono', monospace; margin-bottom: 14px; }
+  .q { font: 700 clamp(26px, 3.2vw, 44px)/1.2 'Bricolage Grotesque', sans-serif; letter-spacing: -0.01em; }
+  .q small { display: block; font: 400 clamp(20px, 2vw, 28px)/1.45 'Atkinson Hyperlegible', sans-serif; margin-top: 18px; }
+  code { font: 600 .9em 'JetBrains Mono', monospace; }
+  .a { margin-top: 30px; background: #fff; border-left: 10px solid var(--green); padding: 18px 24px; font-size: clamp(20px, 2vw, 28px); line-height: 1.4; display: none; }
+  .a b { display: block; font: 800 clamp(28px, 3vw, 42px) 'Bricolage Grotesque', sans-serif; color: var(--green); }
+  .card.revealed .a { display: block; }
+  footer { padding: 0 36px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font: 500 14px 'JetBrains Mono'; color: var(--muted); }
+  footer button { font: 700 16px 'Atkinson Hyperlegible'; padding: 10px 18px; border-radius: 8px; border: 2px solid var(--ink); background: #fff; cursor: pointer; }
+  footer button.go { background: var(--blue); color: #fff; border-color: var(--blue); }
+  button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .card { min-width: 0; } @media (max-width: 600px) { .card { padding: 24px 18px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Read the red ✗</h1>
+  <span class="count" id="count"></span>
+</header>
+<div class="bank" id="bank">
+  <!-- One button per possible answer. A card's answer must match a button's text exactly. -->
+  <button type="button">TEST FAILED</button><button type="button">BROKEN YAML</button><button type="button">MISSING STEP</button>
+  <span class="legend">Every log is from a real failed run in kabeier/gh-actions-demo. The ✗ line is the step that failed.</span>
+</div>
+<div class="stagearea">
+  <div class="card" id="card">
+    <div class="who">A real failed run · TEST FAILED, BROKEN YAML or MISSING STEP in chat on "go"</div>
+    <div class="q" id="q"></div>
+    <div class="a" id="a"></div>
+  </div>
+</div>
+<footer>
+  <button id="prev">← Back</button><button class="go" id="reveal">Reveal (space)</button><button id="next">Next →</button>
+  <span>← → to move · space to reveal · first 6 cards are the core set · last card is a bonus</span>
+</footer>
+<script>
+  // [request, answer, why]
+  const Q = [
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ Run tests</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">FAIL ./main.test.js\n  ✕ tests factorial(3) = 6\n\n    Expected: 7\n    Received: 6\n\nTests:       1 failed, 6 passed, 7 total\n❌ Tests failed\nError: Process completed with exit code 1.</pre>",
+        "TEST FAILED",
+        "Every step ran; a test failed. Fix the code or the test (here the test is wrong: 3! is 6), then push again."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ (the run never started)</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">Invalid workflow file: .github/workflows/run-tests.yml\nYou have an error in your yaml syntax on line 12</pre>",
+        "BROKEN YAML",
+        "GitHub couldn't read the file: indentation is off near line 12. Line it up with spaces."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ Install dependencies</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">npm error code ENOENT\nnpm error syscall open\nnpm error path /home/runner/work/gh-actions-demo/\n               gh-actions-demo/package.json\nnpm error enoent Could not read package.json\nError: Process completed with exit code 254.</pre>",
+        "MISSING STEP",
+        "No package.json on the runner: the code was never copied there. Add  uses: actions/checkout@v4  as the first step."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ Run tests</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">&gt; trial@1.0.0 test\n&gt; jest\n\nsh: 1: jest: not found\nError: Process completed with exit code 127.</pre>",
+        "MISSING STEP",
+        "package.json doesn't list Jest, and no step installs it. Add  run: npm install jest  (or list Jest in package.json). Exit 127 = command not found."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ (the run never started)</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">Invalid workflow file: .github/workflows/run-jest.yml\n(Line: 13, Col: 5): Unexpected value &#x27;step&#x27;</pre>",
+        "BROKEN YAML",
+        "A typo in a keyword: it's  steps:  with an s. GitHub only accepts its own keywords."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ Run tests</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">pytest: command not found\nError: Process completed with exit code 127.</pre>",
+        "MISSING STEP",
+        "setup-python gives you Python, not pytest. Add  run: pip install pytest  before the tests."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ Run tests</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">FAILED test_roman_numerals.py::test_03_odd_numerals\nE       AssertionError: assert &#x27;IIII&#x27; == &#x27;IV&#x27;\n========== 2 failed, 2 passed in 0.02s ==========\nError: Process completed with exit code 1.</pre>",
+        "TEST FAILED",
+        "The workflow worked; the code returns \"lazy\" numerals. Fix to_roman and push."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ Run tests in container</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">&gt; trial@1.0.0 test\n&gt; jest\n\nFAIL ./main.test.js\nTests:       1 failed, 6 passed, 7 total\nError: Process completed with exit code 1.</pre>",
+        "TEST FAILED",
+        "Same failure, inside Docker. The container's exit code becomes the step's exit code."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ (the run never started)</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">Invalid workflow file: .github/workflows/hello-world.yml\nYou have an error in your yaml syntax on line 8</pre>",
+        "BROKEN YAML",
+        "There's a TAB on line 9 (GitHub points at the line before it). YAML needs spaces. VS Code: bottom bar → \"Spaces: 2\"."
+    ],
+    [
+        "<span style=\"font:600 16px JetBrains Mono,monospace;color:#5b6577\">✗ Build Docker image (Bonus)</span><pre style=\"font:500 clamp(15px,1.55vw,21px)/1.45 JetBrains Mono,monospace;background:#0d1117;color:#c9d1d9;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0;overflow-x:auto;max-width:100%;box-sizing:border-box;border:1px solid #30363d\">ERROR: failed to build: failed to solve:\n  failed to read dockerfile:\n  open Dockerfile: no such file or directory\nError: Process completed with exit code 1.</pre>",
+        "MISSING STEP",
+        "The Dockerfile IS in the repo, but the runner starts empty. No actions/checkout = no files to build from."
+    ]
+  ]
+  let i = 0
+  const $ = (s) => document.querySelector(s)
+  const btns = [...document.querySelectorAll('#bank button')]
+  function draw() {
+    $('#card').classList.remove('revealed')
+    $('#q').innerHTML = Q[i][0]
+    $('#a').innerHTML = `<b>${Q[i][1]}</b>${Q[i][2]}`
+    $('#count').textContent = `${i + 1} / ${Q.length}`
+    btns.forEach((s) => s.className = '')
+  }
+  function reveal(picked) {
+    $('#card').classList.add('revealed')
+    btns.forEach((s) => s.className = s.textContent === Q[i][1] ? 'hit' : (s.textContent === picked ? 'miss' : ''))
+  }
+  btns.forEach((b) => b.onclick = () => reveal(b.textContent))
+  const go = (n) => { i = Math.min(Math.max(n, 0), Q.length - 1); draw() }
+  $('#prev').onclick = () => go(i - 1); $('#next').onclick = () => go(i + 1); $('#reveal').onclick = () => reveal()
+  addEventListener('keydown', (e) => {
+    if (e.key === ' ') { e.preventDefault(); reveal() }
+    if (e.key === 'ArrowRight') go(i + 1)
+    if (e.key === 'ArrowLeft') go(i - 1)
+  })
+  draw()
+</script>
+</body>
+</html>

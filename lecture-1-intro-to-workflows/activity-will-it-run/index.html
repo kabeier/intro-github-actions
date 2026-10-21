@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Will it run? · Intro to Workflows</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f4f6f9; --grid:#dce3ee; --ink:#1b2230; --muted:#5b6577; --blue:#2552c9; --green:#13795b; --red:#c8372d; --sticky:#ffe76a; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; color: var(--ink); display: grid; grid-template-rows: auto auto 1fr auto;
+    background: var(--paper) linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 40px 40px,
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 40px 40px; }
+  header { padding: 20px 36px 0; display: flex; justify-content: space-between; align-items: baseline; gap: 20px; }
+  h1 { font: 800 40px 'Bricolage Grotesque', sans-serif; margin: 0; letter-spacing: -0.02em; }
+  .count { font: 700 20px 'JetBrains Mono', monospace; color: var(--muted); }
+  .bank { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 36px 0; }
+  .bank button { font: 700 22px 'JetBrains Mono', monospace; background: #fff; border: 2px solid var(--ink); border-radius: 6px; padding: 8px 18px; cursor: pointer; color: var(--ink); }
+  .bank button.hit { background: var(--green); border-color: var(--green); color: #fff; }
+  .bank button.miss { background: var(--red); border-color: var(--red); color: #fff; }
+  .bank .legend { align-self: center; font-size: 16px; color: var(--muted); margin-left: 8px; }
+  .stagearea { display: grid; place-items: center; padding: 20px 36px; }
+  .card { width: min(1100px, 100%); background: var(--sticky); padding: 48px 56px; transform: rotate(-1deg);
+    box-shadow: 0 18px 30px -12px rgb(27 34 48 / 0.35); }
+  .who { font: 700 18px 'JetBrains Mono', monospace; margin-bottom: 14px; }
+  .q { font: 700 clamp(26px, 3.2vw, 44px)/1.2 'Bricolage Grotesque', sans-serif; letter-spacing: -0.01em; }
+  .q small { display: block; font: 400 clamp(20px, 2vw, 28px)/1.45 'Atkinson Hyperlegible', sans-serif; margin-top: 18px; }
+  code { font: 600 .9em 'JetBrains Mono', monospace; }
+  .a { margin-top: 30px; background: #fff; border-left: 10px solid var(--green); padding: 18px 24px; font-size: clamp(20px, 2vw, 28px); line-height: 1.4; display: none; }
+  .a b { display: block; font: 800 clamp(28px, 3vw, 42px) 'Bricolage Grotesque', sans-serif; color: var(--green); }
+  .card.revealed .a { display: block; }
+  footer { padding: 0 36px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font: 500 14px 'JetBrains Mono'; color: var(--muted); }
+  footer button { font: 700 16px 'Atkinson Hyperlegible'; padding: 10px 18px; border-radius: 8px; border: 2px solid var(--ink); background: #fff; cursor: pointer; }
+  footer button.go { background: var(--blue); color: #fff; border-color: var(--blue); }
+  button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .card { min-width: 0; } @media (max-width: 600px) { .card { padding: 24px 18px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Will it run?</h1>
+  <span class="count" id="count"></span>
+</header>
+<div class="bank" id="bank">
+  <!-- One button per possible answer. A card's answer must match a button's text exactly. -->
+  <button type="button">RUNS</button><button type="button">DOESN'T RUN</button>
+  <span class="legend">Branches under a trigger are a filter. For pull_request, the filter is the branch the PR targets.</span>
+</div>
+<div class="stagearea">
+  <div class="card" id="card">
+    <div class="who">A workflow's on: block, then something happens · RUNS or DOESN'T RUN in chat on "go"</div>
+    <div class="q" id="q"></div>
+    <div class="a" id="a"></div>
+  </div>
+</div>
+<footer>
+  <button id="prev">← Back</button><button class="go" id="reveal">Reveal (space)</button><button id="next">Next →</button>
+  <span>← → to move · space to reveal · first 6 cards are the core set · last card is a bonus</span>
+</footer>
+<script>
+  // [request, answer, why]
+  const Q = [
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  push:</pre><span style=\"font-size:.8em\">You push a branch called <b>feature-login</b>.</span>",
+        "RUNS",
+        "No branches listed = every branch. (Tested: pushes to dev and other branches all ran Hello World.)"
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  push:\n    branches:\n      - main</pre><span style=\"font-size:.8em\">You push to <b>dev</b>.</span>",
+        "DOESN'T RUN",
+        "The filter says main only. (Tested: Run Test Suite, filtered to dev, didn't run on pushes to main.)"
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  push:\n    branches:\n      - main</pre><span style=\"font-size:.8em\">You merge a pull request into <b>main</b>.</span>",
+        "RUNS",
+        "A merge adds a commit to main: that's a push to main."
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  pull_request:\n    branches:\n      - main</pre><span style=\"font-size:.8em\">You open a pull request from dev into <b>main</b>.</span>",
+        "RUNS",
+        "The PR's target (base) is main. (Tested: PR #1 ran the tests.)"
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  pull_request:\n    branches:\n      - main</pre><span style=\"font-size:.8em\">You push to <b>dev</b>, no pull request.</span>",
+        "DOESN'T RUN",
+        "This workflow only listens for pull requests, not pushes."
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  pull_request:\n    branches:\n      - main</pre><span style=\"font-size:.8em\">You open a pull request from feature-greeting into <b>dev</b>.</span>",
+        "DOESN'T RUN",
+        "The branch filter is the PR's TARGET. This PR targets dev. (Tested: PR #2 into dev, no test run.)"
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  schedule:\n    - cron: &quot;0 0 * * *&quot;</pre><span style=\"font-size:.8em\">It's midnight <b>UTC</b>.</span>",
+        "RUNS",
+        "Every day at 00:00 UTC (that's evening in the US). Fields: minute hour day month weekday."
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  push:\n    branches:\n      - dev</pre><span style=\"font-size:.8em\">You click \"Run workflow\" to start it by hand.</span>",
+        "DOESN'T RUN",
+        "No workflow_dispatch, so there's no button. GitHub refuses: \"Workflow does not have 'workflow_dispatch' trigger\"."
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  workflow_dispatch:</pre><span style=\"font-size:.8em\">You click \"Run workflow\" on the workflow's page.</span>",
+        "RUNS",
+        "workflow_dispatch = can be started by hand."
+    ],
+    [
+        "<pre style=\"font:500 clamp(18px,2vw,26px)/1.4 JetBrains Mono,monospace;background:#1b2230;color:#e9edf5;padding:14px 20px;border-radius:8px;white-space:pre;text-align:left;margin:0 0 12px;overflow-x:auto;max-width:100%;box-sizing:border-box\">on:\n  push:</pre><span style=\"font-size:.8em\">Bonus: you edit README.md <b>on github.com</b> and click Commit.</span>",
+        "RUNS",
+        "A commit made on the website is still a push. (Tested.)"
+    ]
+  ]
+  let i = 0
+  const $ = (s) => document.querySelector(s)
+  const btns = [...document.querySelectorAll('#bank button')]
+  function draw() {
+    $('#card').classList.remove('revealed')
+    $('#q').innerHTML = Q[i][0]
+    $('#a').innerHTML = `<b>${Q[i][1]}</b>${Q[i][2]}`
+    $('#count').textContent = `${i + 1} / ${Q.length}`
+    btns.forEach((s) => s.className = '')
+  }
+  function reveal(picked) {
+    $('#card').classList.add('revealed')
+    btns.forEach((s) => s.className = s.textContent === Q[i][1] ? 'hit' : (s.textContent === picked ? 'miss' : ''))
+  }
+  btns.forEach((b) => b.onclick = () => reveal(b.textContent))
+  const go = (n) => { i = Math.min(Math.max(n, 0), Q.length - 1); draw() }
+  $('#prev').onclick = () => go(i - 1); $('#next').onclick = () => go(i + 1); $('#reveal').onclick = () => reveal()
+  addEventListener('keydown', (e) => {
+    if (e.key === ' ') { e.preventDefault(); reveal() }
+    if (e.key === 'ArrowRight') go(i + 1)
+    if (e.key === 'ArrowLeft') go(i - 1)
+  })
+  draw()
+</script>
+</body>
+</html>

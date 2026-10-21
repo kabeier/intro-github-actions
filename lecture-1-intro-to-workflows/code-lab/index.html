@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Lab 1 · Intro to Workflows</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f4f6f9; --grid:#dce3ee; --ink:#1b2230; --muted:#5b6577; --blue:#2552c9; --green:#13795b; --sticky:#ffe76a; --red:#b3261e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; color: var(--ink); font-size: 18px; line-height: 1.55;
+    background: var(--paper) linear-gradient(var(--grid) 1px, transparent 1px) -1px -1px / 40px 40px,
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px) -1px -1px / 40px 40px; }
+  main { max-width: 900px; margin: 0 auto; padding: 48px 28px 80px; }
+  .back { color: var(--blue); font-weight: 700; }
+  h1 { font: 800 clamp(40px, 6vw, 64px)/0.98 'Bricolage Grotesque', sans-serif; letter-spacing: -0.03em; margin: 18px 0 14px; }
+  .lede { color: var(--muted); font-size: 20px; margin: 0 0 28px; max-width: 62ch; }
+  h2 { font: 800 28px/1.15 'Bricolage Grotesque', sans-serif; margin: 0 0 10px; }
+  h3 { font: 800 21px 'Bricolage Grotesque', sans-serif; margin: 26px 0 6px; }
+  section { background: #fff; border: 2px solid var(--ink); border-radius: 4px; padding: 28px; margin-bottom: 28px; }
+  section > p { margin: 0 0 14px; }
+  .choose { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .choose a { display: block; background: #fff; border: 2px solid var(--grid); border-radius: 4px; padding: 16px 18px; color: var(--ink); text-decoration: none; }
+  .choose a:hover, .choose a:focus-visible { border-color: var(--blue); }
+  .choose b { display: block; color: var(--blue); font-size: 20px; }
+  .choose span { color: var(--muted); font-size: 16px; }
+  @media (max-width: 700px) { .choose { grid-template-columns: 1fr; } }
+  ol.steps { padding-left: 1.4em; margin: 0 0 8px; }
+  ol.steps > li { margin-bottom: 14px; }
+  ol.steps > li::marker { font-weight: 700; color: var(--blue); }
+  code { font-size: 0.9em; background: #e8ecf3; padding: 1px 5px; border-radius: 3px; }
+  .cmdwrap { position: relative; margin: 8px 0 6px; }
+  pre.cmd { background: var(--ink); color: #fff; padding: 16px 18px; padding-right: 90px; border-radius: 4px; overflow-x: auto; margin: 0; font-size: 15px; }
+  pre.cmd code { background: none; padding: 0; }
+  pre.json { max-height: 420px; }
+  pre.pic { background: #fff; border: 2px solid var(--grid); border-radius: 4px; padding: 14px 18px; overflow-x: auto; font-size: 15px; margin: 8px 0 14px; }
+  .copy { position: absolute; top: 10px; right: 10px; font: 700 14px 'Atkinson Hyperlegible'; padding: 6px 12px; border-radius: 4px; border: 0; background: var(--sticky); color: var(--ink); cursor: pointer; }
+  .note { margin: 10px 0 0; padding: 14px 18px; background: var(--sticky); transform: rotate(-0.4deg); }
+  .req { border: 2px solid var(--grid); border-radius: 4px; padding: 16px 18px; margin: 14px 0; }
+  .req h3 { margin: 0 0 8px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .method { font: 700 15px 'Atkinson Hyperlegible'; color: #fff; background: var(--blue); padding: 2px 8px; border-radius: 3px; }
+  .method.post { background: var(--green); }
+  .req dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+  .req dt { font-weight: 700; color: var(--muted); }
+  .req dd { margin: 0; overflow-wrap: anywhere; }
+  .expect { color: var(--green); font-weight: 700; }
+  .bad { color: var(--red); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { font-size: 15px; color: var(--muted); }
+  .dl { display: inline-block; background: var(--sticky); color: var(--ink); font-weight: 700; text-decoration: none; padding: 12px 18px; border-radius: 4px; margin: 4px 0 10px; }
+  details { margin-top: 10px; } summary { cursor: pointer; font-weight: 700; color: var(--blue); }
+  a { color: var(--blue); }
+  a:focus-visible, summary:focus-visible, .copy:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  pre.see { background: #fff; border: 2px solid var(--grid); border-left: 8px solid var(--green); border-radius: 4px; padding: 12px 16px; overflow-x: auto; font-size: 15px; margin: 6px 0 12px; }
+  pre.see .e { color: var(--red); white-space: pre-wrap; }
+  .label { font-weight: 700; color: var(--green); font-size: 15px; margin-top: 6px; }
+  .os { display: grid; grid-template-columns: 1fr; gap: 0 20px; }
+  .os h4 { margin: 6px 0 2px; font-size: 16px; }
+  @media (max-width: 700px) { .os { grid-template-columns: 1fr; } }
+  section h2 .n { color: var(--blue); }
+  td code { overflow-wrap: anywhere; }
+  .os > div, ol.steps > li { min-width: 0; }
+  @media (max-width: 700px) { table { display: block; overflow-x: auto; } section { padding: 18px; } }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="../../">← GitHub Actions home</a>
+  <h1>Code Lab 1: your first workflow</h1>
+  <p class="lede">Follow along with Lecture 1. You'll make a repo, add a workflow, push it, and watch GitHub run it in the Actions tab. Then you'll limit it to one branch and watch it <b>not</b> run. Everything here was run for real in <a href="https://github.com/kabeier/gh-actions-demo/actions" target="_blank" rel="noopener">kabeier/gh-actions-demo</a>.</p>
+
+  <div class="choose">
+    <a href="#s1"><b>In class</b><span>Sections 1–4 follow the slides.</span></a>
+    <a href="#breaks"><b>Something broke?</b><span>Jump to the table at the bottom.</span></a>
+  </div>
+
+  <section id="s1">
+    <h2><span class="n">1 ·</span> A new repo</h2>
+    <ol class="steps">
+      <li>On <b>github.com</b>: <b>+</b> → <b>New repository</b> → name it <code>hello-actions</code>, <b>Public</b>, <b>don't</b> add a README → <b>Create repository</b>.</li>
+      <li>In your terminal:
+        <div class="cmdwrap"><pre class="cmd"><code>mkdir hello-actions
+cd hello-actions
+git init
+mkdir -p .github/workflows
+code .</code></pre><button type="button" class="copy">Copy</button></div>
+        Windows PowerShell: <code>mkdir .github/workflows</code> also works.</li>
+    </ol>
+  </section>
+
+  <section id="s2">
+    <h2><span class="n">2 ·</span> hello-world.yml</h2>
+    <p>In VS Code, create <code>.github/workflows/hello-world.yml</code> (a dot before github, workflow<b>s</b> with an s). Type it; indent with <b>spaces</b>:</p>
+    <div class="cmdwrap"><pre class="cmd"><code>name: Hello World Workflow
+
+on:
+  push:
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print a message
+        run: echo &quot;Hello from GitHub Actions!&quot;</code></pre><button type="button" class="copy">Copy</button></div>
+    <table>
+      <tr><th>Line</th><th>Means</th></tr>
+      <tr><td><code>name</code></td><td>Any name. Name it after what it does.</td></tr>
+      <tr><td><code>on: push</code></td><td>Run on every push. No branches listed = <b>any</b> branch.</td></tr>
+      <tr><td><code>jobs → say-hello</code></td><td>One job (one task for the robot).</td></tr>
+      <tr><td><code>runs-on</code></td><td>The machine: a fresh Ubuntu every time.</td></tr>
+      <tr><td><code>steps</code></td><td>Labeled steps. <code>run</code> = a terminal command.</td></tr>
+    </table>
+  </section>
+
+  <section id="s3">
+    <h2><span class="n">3 ·</span> Push it and open the Actions tab</h2>
+    <div class="cmdwrap"><pre class="cmd"><code>git add .
+git commit -m &quot;Add hello world workflow&quot;
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/hello-actions.git
+git push -u origin main</code></pre><button type="button" class="copy">Copy</button></div>
+    <p>On github.com, open your repo → <b>Actions</b> → <b>Hello World Workflow</b> → the run → <b>say-hello</b> → expand <b>Print a message</b>. A yellow dot means it's running; a green ✓ means done. You should see:</p>
+    <pre class="see">✓ Set up job
+✓ Print a message
+    Run echo &quot;Hello from GitHub Actions!&quot;
+    Hello from GitHub Actions!
+✓ Complete job</pre>
+  </section>
+
+  <section id="s4">
+    <h2><span class="n">4 ·</span> A branch filter: watch it not run</h2>
+    <ol class="steps">
+      <li>Change the trigger in hello-world.yml to:
+        <div class="cmdwrap"><pre class="cmd"><code>on:
+  push:
+    branches:
+      - main</code></pre><button type="button" class="copy">Copy</button></div>
+        <div class="cmdwrap"><pre class="cmd"><code>git commit -am &quot;Only run on main&quot;
+git push</code></pre><button type="button" class="copy">Copy</button></div>
+        Actions: a new run, for <b>main</b>.</li>
+      <li>Now push a different branch:
+        <div class="cmdwrap"><pre class="cmd"><code>git checkout -b try-filter
+echo &quot;test&quot; &gt;&gt; notes.txt
+git add .
+git commit -m &quot;Change on a branch&quot;
+git push -u origin try-filter</code></pre><button type="button" class="copy">Copy</button></div>
+        Actions: <b>no new run</b> for try-filter. That's correct: the filter said main only.</li>
+      <li>Go back: <code>git checkout main</code>.</li>
+    </ol>
+    <p class="note">The other triggers from the lecture: <code>pull_request: branches: - main</code> runs for pull requests <b>into</b> main; <code>schedule: - cron: "0 0 * * *"</code> runs daily at midnight UTC.</p>
+  </section>
+
+  <section>
+    <h2>Check: you're done when…</h2>
+    <ol class="steps">
+      <li>Your repo's Actions tab shows a green ✓ "Hello World Workflow" run with "Hello from GitHub Actions!" in its output</li>
+      <li>You pushed try-filter and saw that it did <b>not</b> run</li>
+    </ol>
+  </section>
+
+  <section id="breaks">
+    <h2>When something breaks</h2>
+    <table>
+      <tr><th>You see</th><th>It means</th><th>Fix</th></tr>
+      <tr><td>No Actions run at all after pushing</td><td>The file isn't at <code>.github/workflows/</code> exactly, or doesn't end in <code>.yml</code></td><td>Check the folder names: <code>.github</code> with a dot, <code>workflows</code> with an s</td></tr>
+      <tr><td><code>Invalid workflow file … You have an error in your yaml syntax on line N</code></td><td>Indentation, or a tab, near line N (GitHub may point at the line before a tab)</td><td>Use spaces only; line up keys at the same level</td></tr>
+      <tr><td><code>(Line: 13, Col: 5): Unexpected value 'step'</code></td><td>A misspelled keyword</td><td>It's <code>steps:</code>, <code>runs-on:</code>, <code>jobs:</code>, exactly</td></tr>
+      <tr><td><code>remote origin already exists</code></td><td>You added the remote before</td><td><code>git remote set-url origin &lt;url&gt;</code></td></tr>
+      <tr><td><code>src refspec main does not match any</code></td><td>Nothing committed yet</td><td><code>git add .</code> and <code>git commit</code> first</td></tr>
+      <tr><td>The Actions tab is missing</td><td>Actions are turned off for the repo</td><td>Settings → Actions → General → Allow all actions</td></tr>
+    </table>
+  </section>
+
+</main>
+<script>
+  document.querySelectorAll('.copy').forEach((b) => b.onclick = async () => {
+    await navigator.clipboard.writeText(b.previousElementSibling.innerText.trim()); b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 1500)
+  })
+</script>
+</body>
+</html>

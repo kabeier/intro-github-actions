@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 1 · Intro to Workflows</title>
+<link rel="stylesheet" href="../shared/deck.css">
+<style>
+  pre.yml { font-size: 23px; line-height: 1.45; padding: 20px 26px; }
+  pre.yml .k { color: #9fc3ff; } pre.yml .v { color: #ffd39f; } pre.yml .c { color: #8fa1bd; }
+  pre.log { font: 19px/1.45 var(--mono); background: #0d1117; color: #c9d1d9; padding: 18px 24px; border-radius: 10px; border: 1px solid #30363d; white-space: pre; overflow: hidden; }
+  pre.log .h { color: #8b949e; } pre.log .ok { color: #3fb950; } pre.log .bad { color: #f85149; } pre.log .cmd { color: #79c0ff; }
+  .cmdbox pre { font-size: 22px; padding: 16px 22px; }
+  .tri { font-size: 21px !important; }
+  .tri td, .tri th { vertical-align: top; }
+  .tri pre { font-size: 18px; padding: 10px 14px; margin: 0; background: #1b2230; }
+</style>
+</head>
+<body data-minutes="40">
+<div class="stage">
+
+<!-- ============ OPEN (0–10) ============ -->
+<section class="slide title" data-seg="Open" data-at="0">
+  <div class="kicker">Fundamentals · GitHub Actions · Part 1 of 2</div>
+  <h1>Let a robot run your checks</h1>
+  <p class="sub">GitHub Actions workflows: what they are, where they live, and your first one, running on GitHub.</p>
+  <aside class="notes">
+    <p><b>Before class</b> (demo-kit/RUNBOOK.md): logged in to GitHub in your browser. Tabs: this deck, <a href="https://github.com/kabeier/gh-actions-demo/actions">kabeier/gh-actions-demo → Actions</a> (backup: every run from the lessons, green and red), Code Lab 1.</p>
+    <p>Press <b>T</b>. Students need: VS Code, a terminal, git, and to be <b>logged in to github.com</b>.</p>
+  </aside>
+</section>
+
+<section class="slide statement" data-seg="Open" data-at="1">
+  <h2>Who ran the tests before they pushed?</h2>
+  <ul style="margin-top:30px">
+    <li>Wednesday: <code>pytest</code> and <code>npm test</code> give an exit code. 0 = green</li>
+    <li>But only if someone <b>remembers</b> to run them, on <b>their</b> laptop</li>
+    <li>Today: GitHub runs them for you, the same way, on every push</li>
+  </ul>
+  <aside class="notes">
+    <p>Ask chat: "Be honest: who pushed code this week without running the tests first?"</p>
+    <p>"Teams don't trust memory. They automate it. That's Continuous Integration (CI)."</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="What is a workflow?" data-at="2">
+  <h2>Programming a robot: exact instructions</h2>
+  <div class="cols wide-left">
+    <div>
+      <ul class="small">
+        <li>A workflow is a recipe GitHub follows <b>every time</b> something happens in your repo</li>
+        <li>The robot does <b>only</b> what you wrote, in order. Nothing else.</li>
+        <li>Like the peanut-butter-and-jelly "exact instructions" challenge: forget "open the jar" and there's no sandwich</li>
+      </ul>
+    </div>
+    <div class="card blue"><h3>Watch (2 min)</h3>
+      <p class="small">The Exact Instructions Challenge</p>
+      <p class="small"><a href="https://youtu.be/cDA3_5982h8?si=YmKsp_W8l3H8Iy5s" target="_blank" rel="noopener">youtu.be/cDA3_5982h8</a></p></div>
+  </div>
+  <p class="bottomline">Forget a step in a workflow and it fails the same way.</p>
+  <aside class="notes">
+    <p>Optional: play the first ~90 seconds of the video (it's in the curriculum).</p>
+    <p>Plant the seed for Lecture 2: "forget to copy the code onto the robot's machine" is a real failure (the activity in Lecture 2).</p>
+  </aside>
+</section>
+
+<section class="slide diagram" data-seg="What is a workflow?" data-at="4">
+  <img src="../diagrams/GA1-01-event-to-steps.png" alt="Event, workflow, job, steps, output. A workflow is exact instructions for a robot. Event: you push code (on: push). Workflow: hello-world.yml (name:). Job: say-hello on ubuntu-latest (runs-on:). Steps: Print a message (run: echo). Output: Hello from GitHub Actions! and a green check. The YAML: name Hello World Workflow; on push; jobs say-hello runs-on ubuntu-latest; steps: a step named Print a message that runs echo. It lives in your repo at .github/workflows/hello-world.yml. One file is one workflow; a workflow has jobs; a job has steps. Like the exact-instructions sandwich challenge, the robot does only what you wrote, in order.">
+  <div class="src">diagrams/GA1-01-event-to-steps.tldr</div>
+  <aside class="notes">
+    <p>"Event → Workflow → Job → Steps → Output. Point at each box, then at the line of YAML that makes it."</p>
+    <ul>
+      <li><b>Event:</b> what triggers it (a push, a pull request).</li>
+      <li><b>Job:</b> one task for the robot. <b>Steps:</b> the commands inside it.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Why CI?" data-at="6">
+  <h2>Why every team uses this</h2>
+  <div class="cols">
+    <ul class="small">
+      <li><b>Automated testing:</b> on every change, not when someone remembers</li>
+      <li><b>Early bug detection:</b> before it reaches production</li>
+      <li><b>Team confidence:</b> refactor and collaborate without fear</li>
+      <li><b>Same environment</b> for everyone</li>
+      <li><b>Fast feedback:</b> a failure shows up in minutes</li>
+    </ul>
+    <div class="card green"><h3>A normal day at work</h3>
+      <ol class="small" style="padding-left:1.1em">
+        <li>You open a pull request</li>
+        <li>GitHub runs the tests automatically</li>
+        <li>The team reviews the code <b>and</b> the results</li>
+        <li>Only passing code is merged</li>
+      </ol></div>
+  </div>
+  <p class="bottomline">In professional teams, code is rarely merged without checks passing.</p>
+  <aside class="notes">
+    <p>"Workflows are no longer optional. Employers expect you to read a red ✗ and fix it."</p>
+    <p>Other common uses: linting/formatting, building Docker images, deploying after tests pass.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Why CI?" data-at="8">
+  <h2>Don't write every step yourself</h2>
+  <table class="dbt">
+    <tr><th></th><th>Docker</th><th>GitHub Actions</th></tr>
+    <tr><td><b>Ready-made pieces</b></td><td>images</td><td class="pk">actions</td></tr>
+    <tr><td><b>Where to find them</b></td><td>Docker Hub</td><td><a href="https://github.com/marketplace?type=actions" target="_blank" rel="noopener">GitHub Marketplace</a></td></tr>
+    <tr><td><b>Use one</b></td><td>FROM node:18-alpine</td><td class="pk">uses: actions/setup-node@v4</td></tr>
+    <tr><td><b>Official ones</b></td><td>node, python</td><td>actions/checkout · actions/setup-node · actions/setup-python</td></tr>
+  </table>
+  <p class="bottomline">Reuse trusted actions. Pin the version (@v4), like you pin an image tag.</p>
+  <aside class="notes">
+    <p>Open the Marketplace for 30 seconds: search "setup-node", show the verified badge (like Docker's Official Image badge).</p>
+    <p>"Same habit as Docker: official, maintained, pinned."</p>
+  </aside>
+</section>
+
+<!-- ============ FIRST WORKFLOW (10–21) ============ -->
+<section class="slide" data-seg="YAML" data-at="10">
+  <h2>YAML in three rules</h2>
+  <div class="cols wide-left">
+    <pre class="yml"><span class="k">name:</span> <span class="v">Hello World Workflow</span>   <span class="c"># key: value</span>
+
+<span class="k">jobs:</span>
+  <span class="k">say-hello:</span>                 <span class="c"># 2 spaces in = inside</span>
+    <span class="k">steps:</span>
+      - <span class="k">name:</span> <span class="v">Print a message</span>  <span class="c"># - = an item in a list</span>
+        <span class="k">run:</span> <span class="v">echo "Hi"</span></pre>
+    <ol class="steps small">
+      <li><b>key: value</b> (space after the colon)</li>
+      <li><b>Indent with spaces</b>, never tabs. Indenting = "belongs to"</li>
+      <li><b>-</b> starts a list item</li>
+    </ol>
+  </div>
+  <p class="bottomline">Wrong indentation = "Invalid workflow file". The robot can't even read it.</p>
+  <aside class="notes">
+    <p>"Dockerfiles were one instruction per line. YAML is a tree: indentation is the structure."</p>
+    <p>VS Code shows indentation guides. Two spaces per level is the convention.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Your terminal: a repo" data-at="11">
+  <h2>Your terminal: a repo for the robot</h2>
+  <div class="cols cmdbox" style="gap:32px">
+    <div>
+      <p class="small" style="margin-bottom:8px"><b>1 · On github.com:</b> New repository → <code>hello-actions</code>, Public, <b>no README</b> → Create</p>
+      <p class="small" style="margin:14px 0 8px"><b>2 · In your terminal</b></p>
+      <pre>mkdir hello-actions
+cd hello-actions
+git init
+mkdir -p .github/workflows
+code .</pre>
+    </div>
+    <div>
+      <p class="small" style="margin-bottom:8px"><b>3 · In VS Code:</b> new file<br><code>.github/workflows/hello-world.yml</code></p>
+      <p class="small muted">Exact folder names: a dot before github, and workflow<b>s</b> with an s.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>** YOUR TERMINAL, about 3 minutes. **</b> Do it live on your own machine.</p>
+    <ul>
+      <li>The <code>.github</code> folder is hidden in Finder: that's normal. VS Code shows it.</li>
+      <li>Windows PowerShell: <code>mkdir .github/workflows</code> works too.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Code along: hello world" data-at="14">
+  <h2>hello-world.yml</h2>
+  <div class="cols" style="grid-template-columns: 1.05fr 1fr; gap:34px">
+    <pre class="yml"><span class="k">name:</span> <span class="v">Hello World Workflow</span>
+
+<span class="k">on:</span>
+  <span class="k">push:</span>
+
+<span class="k">jobs:</span>
+  <span class="k">say-hello:</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+    <span class="k">steps:</span>
+      - <span class="k">name:</span> <span class="v">Print a message</span>
+        <span class="k">run:</span> <span class="v">echo "Hello from GitHub Actions!"</span></pre>
+    <ul class="small" style="font-size:24px">
+      <li><code>name</code>: anything; name it after its job</li>
+      <li><code>on: push</code>: every push, <b>any branch</b> (no branch listed)</li>
+      <li><code>jobs → say-hello</code>: one task</li>
+      <li><code>runs-on</code>: the machine, a fresh Ubuntu</li>
+      <li><code>steps</code>: labeled commands; <code>run</code> = a terminal command</li>
+    </ul>
+  </div>
+  <pre style="font-size:19px; margin-top:16px; padding:12px 20px">git add .   ·   git commit -m "Add hello world workflow"   ·   git branch -M main   ·   git remote add origin https://github.com/YOUR-USERNAME/hello-actions.git   ·   git push -u origin main</pre>
+  <aside class="notes">
+    <p><b>** CODE ALONG, about 5 minutes. **</b> Type the YAML in your real VS Code (students too), save, then commit and push (commands at the bottom; also in Code Lab 1).</p>
+    <p>Read the breakdown line by line, it's the curriculum's. "This doesn't test anything yet: it proves the automation works."</p>
+    <p><b>Watch for:</b> <code>remote origin already exists</code> → <code>git remote set-url origin &lt;url&gt;</code>. <code>src refspec main does not match any</code> → they didn't commit.</p>
+  </aside>
+</section>
+
+<section class="slide diagram" data-seg="The Actions tab" data-at="18">
+  <img src="../diagrams/GA1-02-what-happens.png" alt="What happens when you push. Your laptop runs git push. GitHub reads .github/workflows/*.yml and checks whether on: matches. A runner, a fresh ubuntu-latest virtual machine, runs each step in order and reports success with exit code 0 or failure with an exit code that isn't 0. The Actions tab: repo, Actions, the workflow, the run; job status, each step's output, errors. It's the feedback loop that makes CI worth it. Empty every time: the runner starts with nothing from your repo, no code until actions/checkout, no packages until npm install, like a fresh Docker container. One step fails, the job stops, and the run is a red X.">
+  <div class="src">diagrams/GA1-02-what-happens.tldr</div>
+  <aside class="notes">
+    <p><b>** LIVE, about 2 minutes. **</b> Your repo → <b>Actions</b> tab → "Hello World Workflow" → the run → the <b>say-hello</b> job → expand <b>Print a message</b>.</p>
+    <p>A yellow dot = running, green ✓ = done. Students: thumbs up when they see their green ✓.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="The Actions tab" data-at="20">
+  <h2>What you'll see: a real run</h2>
+  <pre class="log"><span class="ok">✓</span> Set up job
+    Operating System: Ubuntu 24.04.5 LTS
+    Image: ubuntu-24.04
+    Complete job name: say-hello
+<span class="ok">✓</span> Print a message
+    <span class="h">Run echo "Hello from GitHub Actions!"</span>
+    <span class="cmd">echo "Hello from GitHub Actions!"</span>
+    shell: /usr/bin/bash -e {0}
+    Hello from GitHub Actions!
+<span class="ok">✓</span> Complete job</pre>
+  <p class="small muted" style="margin-top:14px">From the demo repo, kabeier/gh-actions-demo: this exact file, run on GitHub in 6 seconds.</p>
+  <p class="bottomline">Every step: the command it ran, then what it printed.</p>
+  <aside class="notes">
+    <p>If a student's run is slow or GitHub is busy, show this, or the demo repo's Actions tab.</p>
+    <p>"Set up job" is GitHub preparing the fresh Ubuntu machine. "Complete job" cleans it up. The robot's machine is thrown away after every run.</p>
+  </aside>
+</section>
+
+<!-- ============ ACTIVITY (21–27) ============ -->
+<section class="slide activity" data-seg="Activity: Will it run?" data-at="21">
+  <h2>Activity: Will it run?</h2>
+  <div class="countdown" data-sec="360"></div>
+  <ol class="steps">
+    <li>You see a workflow's <code>on:</code> block, and something that happens</li>
+    <li>In chat on "go": <b>RUNS</b> or <b>DOESN'T RUN</b></li>
+    <li>Branches listed under a trigger are a filter</li>
+  </ol>
+  <p class="muted small" style="margin-top:24px">Page: activity-will-it-run/</p>
+  <aside class="notes">
+    <p>About 30 seconds a card; the first 6 are the core set. Answers were checked on real runs in kabeier/gh-actions-demo (the midnight cron card is from GitHub's docs).</p>
+  </aside>
+</section>
+
+<!-- ============ TRIGGERS (27–37) ============ -->
+<section class="slide" data-seg="Triggers" data-at="27">
+  <h2><code>on:</code> decides when the robot works</h2>
+  <table class="dbt tri">
+    <tr><th>You want…</th><th>on:</th><th>Typical use</th></tr>
+    <tr><td><b>only one branch</b></td><td><pre>on:
+  push:
+    branches:
+      - main</pre></td><td>deploy only what's on main</td></tr>
+    <tr><td><b>check pull requests</b></td><td><pre>on:
+  pull_request:
+    branches:
+      - main</pre></td><td>run tests before anything merges into main</td></tr>
+    <tr><td><b>on a timer</b></td><td><pre>on:
+  schedule:
+    - cron: "0 0 * * *"</pre></td><td>every day at midnight <b>UTC</b></td></tr>
+  </table>
+  <aside class="notes">
+    <ul>
+      <li><code>pull_request: branches: main</code> = PRs whose <b>target</b> is main.</li>
+      <li>Cron fields: minute hour day month weekday. <code>0 0 * * *</code> = 00:00 UTC daily (that's 7 or 8 pm Eastern the evening before).</li>
+      <li>Why conditions matter: fewer pointless runs, lower cost, matches your git strategy, no accidental deploys.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Code along: a branch filter" data-at="30">
+  <h2>Try it: a branch filter</h2>
+  <div class="cols" style="gap:34px">
+    <div>
+      <p class="small" style="margin-bottom:8px"><b>1 · Change the trigger, then push to main</b></p>
+      <pre class="yml"><span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span>
+      - <span class="v">main</span></pre>
+      <pre style="font-size:19px; margin-top:12px; padding:12px 18px">git commit -am "Only run on main"
+git push</pre>
+    </div>
+    <div>
+      <p class="small" style="margin-bottom:8px"><b>2 · Now push a different branch</b></p>
+      <pre style="font-size:19px; padding:12px 18px">git checkout -b try-filter
+echo "test" &gt;&gt; notes.txt
+git add .
+git commit -m "Change on a branch"
+git push -u origin try-filter</pre>
+      <p class="small" style="margin-top:12px">Actions tab: a run for <b>main</b>, and <b>nothing</b> for try-filter.</p>
+    </div>
+  </div>
+  <p class="bottomline">No run is the correct result: the filter said main only.</p>
+  <aside class="notes">
+    <p><b>** CODE ALONG, about 5 minutes. **</b> Students do both pushes. "No run" surprises people: that's the lesson.</p>
+    <p>Then <code>git checkout main</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Wrap up" data-at="36">
+  <h2>Homework, Part I: Hello Workflows</h2>
+  <p class="small">A new repository with one workflow that:</p>
+  <ol class="steps small">
+    <li>runs on <b>every push, on all branches</b></li>
+    <li>runs on <b>Ubuntu</b></li>
+    <li>uses a shell command to <b>echo Hello Workflows</b></li>
+  </ol>
+  <p class="bottomline">Done = a green ✓ in your Actions tab, with "Hello Workflows" in the step's output.</p>
+  <aside class="notes">
+    <p>Full steps on the class site (Homework Part I). It's today's hello-world.yml with the trigger back to <code>on: push:</code> and a new message.</p>
+  </aside>
+</section>
+
+</div>
+<script src="../shared/deck.js"></script>
+</body>
+</html>

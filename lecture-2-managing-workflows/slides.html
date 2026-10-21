@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 2 · Managing Workflows</title>
+<link rel="stylesheet" href="../shared/deck.css">
+<link rel="stylesheet" href="../shared/codepad.css">
+<style>
+  pre.yml { font-size: 20px; line-height: 1.4; padding: 18px 24px; }
+  pre.yml .k { color: #9fc3ff; } pre.yml .v { color: #ffd39f; } pre.yml .c { color: #8fa1bd; } pre.yml .new { color: #ffe76a; font-weight: 700; }
+  pre.log { font: 18px/1.42 var(--mono); background: #0d1117; color: #c9d1d9; padding: 16px 22px; border-radius: 10px; border: 1px solid #30363d; white-space: pre; overflow: hidden; }
+  pre.log .h { color: #8b949e; } pre.log .ok { color: #3fb950; } pre.log .bad { color: #f85149; } pre.log .cmd { color: #79c0ff; } pre.log .dim { opacity: .65; }
+  .cmdbox pre { font-size: 21px; padding: 14px 20px; }
+</style>
+</head>
+<body data-minutes="40">
+<div class="stage">
+
+<!-- ============ OPEN + LOCAL (0–9) ============ -->
+<section class="slide title" data-seg="Open" data-at="0">
+  <div class="kicker">Fundamentals · GitHub Actions · Part 2 of 2</div>
+  <h1>Tests on every push</h1>
+  <p class="sub">A workflow that runs your Jest suite on dev and on pull requests, by hand when you need it, and inside Docker.</p>
+  <aside class="notes">
+    <p><b>Before class:</b> this deck open in Chrome with internet. Tabs: <a href="https://github.com/kabeier/gh-actions-demo/actions">kabeier/gh-actions-demo → Actions</a> (backup for every step, including a red run and PR #1), Code Lab 2.</p>
+    <p>Press <b>T</b>. Students: a new GitHub repo <code>ci-factorial</code> (Public, no README), and <code>mkdir ci-factorial</code>, <code>cd ci-factorial</code>, <code>git init</code>, <code>code .</code></p>
+  </aside>
+</section>
+
+<section class="slide statement" data-seg="Open" data-at="1">
+  <h2>Lecture 1: the robot said hello. Today it runs your tests.</h2>
+  <ul style="margin-top:30px">
+    <li>On every push to <code>dev</code>, and on every pull request into <code>main</code></li>
+    <li>A failing test turns the run red, and you read the log to fix it</li>
+    <li>Then: run it on demand, and run it in Docker</li>
+  </ul>
+  <aside class="notes">
+    <p>"This is the standard setup at most companies: nothing reaches main without the tests passing."</p>
+  </aside>
+</section>
+
+<section class="slide pad" data-seg="Code along: works locally?" data-at="3">
+  <h2>First: does it work on your laptop? <span class="say">index.js · main.test.js · package.json · Dockerfile</span></h2>
+  <div class="vscode" data-folder="ci-factorial" data-terminal="one" data-term-lines="12" data-run="npm test|npm install --save-dev jest|npm test">
+<script type="text/plain" data-file="index.js" data-start>function factorial(num) {
+  let product = 1;
+
+  for (let i = num; i > 0; i--) {
+    product = product * i;
+  }
+
+  return product;
+}
+
+module.exports = factorial;</script>
+<script type="text/plain" data-file="main.test.js" data-start>const factorial = require("./index.js");
+
+describe("tests factorial for small numbers", () => {
+  test("tests factorial(0) = 1", () => {
+    expect(factorial(0)).toBe(1);
+  });
+
+  test("tests factorial(1) = 1", () => {
+    expect(factorial(1)).toBe(1);
+  });
+
+  test("tests factorial(2) = 2", () => {
+    expect(factorial(2)).toBe(2);
+  });
+
+  test("tests factorial(3) = 6", () => {
+    expect(factorial(3)).toBe(6);
+  });
+});
+
+describe("tests factorial for large numbers", () => {
+  test("tests factorial(10) = 3628800", () => {
+    expect(factorial(10)).toBe(3628800);
+  });
+
+  test("tests factorial(20) = 2432902008176640000", () => {
+    expect(factorial(20)).toBe(2432902008176640000);
+  });
+
+  test("tests factorial(40) = 8.15915283247898e47", () => {
+    expect(factorial(40)).toBe(8.15915283247898e47);
+  });
+});</script>
+<script type="text/plain" data-file="package.json" data-hidden data-start>{
+  "name": "trial",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}</script>
+<script type="text/plain" data-file="Dockerfile" data-hidden data-start>FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+RUN npm install --save-dev jest
+
+COPY . .
+
+CMD ["npm", "test"]</script>
+  </div>
+  <aside class="notes">
+    <p><b>** CODE ALONG, about 5 minutes. **</b> Students paste the four files from <b>Code Lab 2</b> (the curriculum's project, word for word). The slide already has them.</p>
+    <div class="typecode"><p class="th">TYPE THIS, in order</p>
+    <p class="tf"><b>Ctrl+S</b>, then in the terminal:</p><pre>npm test
+npm install --save-dev jest
+npm test</pre>
+    </div>
+    <ul>
+      <li>Terminal: <code>npm test</code> → <b>jest: command not found</b>. The lesson's package.json doesn't list Jest.</li>
+      <li><code>npm install --save-dev jest</code>, then <code>npm test</code> → <b>PASS, 7 passed</b>.</li>
+      <li>"Always confirm it works locally before you hand it to the robot."</li>
+      <li>Then commit and push to <code>main</code> (Code Lab 2, step 2). Add a <code>.gitignore</code> with <code>node_modules</code> first.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide diagram" data-seg="run-tests.yml" data-at="8">
+  <img src="../diagrams/GA2-01-run-tests-plain.png" alt="run-tests.yml in plain English. The YAML: on push to branch dev, and pull_request to branch main; jobs, test, runs-on ubuntu-latest; steps: uses actions/checkout@v4; uses actions/setup-node@v4 with node-version 18; run npm install; run npm install jest; run npm test or else echo Tests failed and exit 1. In plain English: when a push to dev or a PR into main; where a fresh Ubuntu machine; 1, copy this project; 2, set up Node 18; 3, install dependencies and Jest; 4, run the tests, where exit 1 means a red X. uses: is a ready-made action from the Marketplace; run: is a terminal command you write.">
+  <div class="src">diagrams/GA2-01-run-tests-plain.tldr</div>
+  <aside class="notes">
+    <p>"In Ubuntu: copy this project, set up Node, install, run the tests." That's the curriculum's recipe, line for line.</p>
+    <p>Mental model: <b>GitHub Actions is your local workflow, repeated in a clean environment.</b></p>
+  </aside>
+</section>
+
+<!-- ============ ON DEV (10–19) ============ -->
+<section class="slide" data-seg="Code along: run-tests.yml" data-at="10">
+  <h2>run-tests.yml, on a dev branch</h2>
+  <div class="cols" style="grid-template-columns: 1.1fr 1fr; gap:30px">
+    <pre class="yml"><span class="k">name:</span> <span class="v">Run Test Suite</span>
+
+<span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span>
+      - <span class="v">dev</span>
+
+  <span class="k">pull_request:</span>
+    <span class="k">branches:</span>
+      - <span class="v">main</span>
+
+<span class="k">jobs:</span>
+  <span class="k">test:</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+
+    <span class="k">steps:</span>
+      - <span class="k">name:</span> <span class="v">Checkout repository</span>
+        <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
+
+      - <span class="k">name:</span> <span class="v">Set up Node.js</span>
+        <span class="k">uses:</span> <span class="v">actions/setup-node@v4</span>
+        <span class="k">with:</span>
+          <span class="k">node-version:</span> <span class="v">18</span></pre>
+    <div>
+      <pre class="yml">      - <span class="k">name:</span> <span class="v">Install dependencies</span>
+        <span class="k">run:</span> <span class="v">npm install</span>
+
+      - <span class="k">name:</span> <span class="v">Install Jest</span>
+        <span class="k">run:</span> <span class="v">npm install jest</span>
+
+      - <span class="k">name:</span> <span class="v">Run tests</span>
+        <span class="k">run:</span> <span class="v">|</span>
+          <span class="v">npm test || (echo "❌ Tests failed" &amp;&amp; exit 1)</span></pre>
+      <pre style="font-size:19px; margin-top:16px; padding:12px 18px">git checkout -b dev
+git add .
+git commit -m "Run tests in CI"
+git push -u origin dev</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>** CODE ALONG, about 5 minutes. **</b> New file <code>.github/workflows/run-tests.yml</code> (next to hello-world.yml if they have it). Students copy from Code Lab 2; the YAML is the curriculum's, word for word.</p>
+    <ul>
+      <li><code>|</code> = "the next lines are one multi-line command".</li>
+      <li><code>npm test || (…exit 1)</code>: if the tests fail, print ❌ and fail the step.</li>
+      <li>Push to <b>dev</b> → Actions tab: Run Test Suite starts (and Hello World too, if the repo has it).</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-seg="The Actions tab" data-at="15">
+  <h2>Green on dev: the real log</h2>
+  <pre class="log"><span class="ok">✓</span> Checkout repository
+<span class="ok">✓</span> Set up Node.js
+<span class="ok">✓</span> Install dependencies      <span class="dim">up to date, audited 1 package</span>
+<span class="ok">✓</span> Install Jest              <span class="dim">npm warn EBADENGINE … (warnings, not errors)</span>
+                            <span class="dim">added 278 packages, and audited 279 packages in 12s</span>
+<span class="ok">✓</span> Run tests
+    <span class="cmd">npm test || (echo "❌ Tests failed" &amp;&amp; exit 1)</span>
+    &gt; trial@1.0.0 test
+    &gt; jest
+    PASS ./main.test.js
+      tests factorial for small numbers
+        <span class="ok">✓</span> tests factorial(0) = 1
+        …
+    Tests:       7 passed, 7 total</pre>
+  <p class="bottomline">The same PASS you saw on your laptop, from a machine you've never touched.</p>
+  <aside class="notes">
+    <p>From kabeier/gh-actions-demo (dev branch), 24 seconds.</p>
+    <p><b>Students will ask about the yellow "npm warn EBADENGINE":</b> today's Jest prefers Node 20+, and this workflow pins Node 18. They're warnings; the run is green. Changing <code>node-version: 18</code> to <code>20</code> makes them go away (tested: branch example-node-20, zero warnings).</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Break it on purpose" data-at="17">
+  <h2>Break a test, push, read the red ✗</h2>
+  <div class="cols" style="grid-template-columns: 1fr 1.6fr; gap:28px">
+    <div>
+      <p class="small">In <code>main.test.js</code>:</p>
+      <pre style="font-size:19px; padding:12px 16px">expect(factorial(3)).toBe(7);</pre>
+      <pre style="font-size:19px; margin-top:12px; padding:12px 16px">git commit -am "Break a test"
+git push</pre>
+      <p class="small" style="margin-top:12px">Run Test Suite: <b style="color:var(--red)">✗ failure</b>. Hello World: still ✓.</p>
+    </div>
+    <pre class="log" style="font-size:16.5px">FAIL ./main.test.js
+  tests factorial for small numbers
+    <span class="ok">✓</span> tests factorial(0) = 1
+    <span class="ok">✓</span> tests factorial(1) = 1
+    <span class="ok">✓</span> tests factorial(2) = 2
+    <span class="bad">✕</span> tests factorial(3) = 6
+  tests factorial for large numbers  …
+
+  <span class="bad">● tests factorial for small numbers › tests factorial(3) = 6</span>
+
+    Expected: <span class="ok">7</span>
+    Received: <span class="bad">6</span>
+
+      at Object.toBe (main.test.js:17:26)
+
+Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>, 7 total
+❌ Tests failed
+<span class="bad">Error: Process completed with exit code 1.</span></pre>
+  </div>
+  <p class="bottomline">Exit code 1 = red. Wednesday's exit codes are how GitHub knows.</p>
+  <aside class="notes">
+    <p><b>** CODE ALONG, about 3 minutes. **</b> Everyone breaks it and pushes. Open the red run → the <b>test</b> job → the red <b>Run tests</b> step.</p>
+    <p>Then fix it (<code>toBe(6)</code>), commit, push → green again. Real log from kabeier/gh-actions-demo.</p>
+  </aside>
+</section>
+
+<!-- ============ ACTIVITY (19–25) ============ -->
+<section class="slide activity" data-seg="Activity: Read the red X" data-at="19">
+  <h2>Activity: Read the red ✗</h2>
+  <div class="countdown" data-sec="360"></div>
+  <ol class="steps">
+    <li>A real failed run's log appears</li>
+    <li>In chat on "go": <b>TEST FAILED</b>, <b>BROKEN YAML</b> or <b>MISSING STEP</b></li>
+    <li>Then: what's the fix?</li>
+  </ol>
+  <p class="muted small" style="margin-top:24px">Page: activity-read-the-red-x/</p>
+  <aside class="notes">
+    <p>Every log on the cards came from a real failed run in kabeier/gh-actions-demo (branches example-broken-yaml, example-no-checkout, example-no-jest).</p>
+  </aside>
+</section>
+
+<!-- ============ PR, DISPATCH, CODE (25–33) ============ -->
+<section class="slide diagram" data-seg="Pull requests" data-at="25">
+  <img src="../diagrams/GA2-02-dev-pr-main.png" alt="Work on dev, prove it, then merge to main. dev (git push origin dev), then open a pull request dev into main where checks run, then merge into main where only tested code gets. A push to dev runs Run Test Suite and Hello World. The pull_request into main runs Run Test Suite, shown on the PR. The merge is a push to main: Hello World runs, Run Test Suite does not, because its push trigger is dev-only. A red X on the PR says don't merge yet; teams can make it a hard rule in Settings, Branches, require status checks.">
+  <div class="src">diagrams/GA2-02-dev-pr-main.tldr</div>
+  <aside class="notes">
+    <p><b>** LIVE, about 3 minutes. **</b> github.com → your repo → <b>Compare &amp; pull request</b> (dev → main) → the checks appear at the bottom of the PR. Wait for ✓, then <b>Merge</b>.</p>
+    <p>Backup: <a href="https://github.com/kabeier/gh-actions-demo/pull/1">kabeier/gh-actions-demo PR #1</a>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Manual runs" data-at="28">
+  <h2>Run it again without a new commit</h2>
+  <div class="cols" style="gap:34px">
+    <div>
+      <pre class="yml"><span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span>
+      - <span class="v">dev</span>
+  <span class="k">pull_request:</span>
+    <span class="k">branches:</span>
+      - <span class="v">main</span>
+  <span class="new">workflow_dispatch:</span></pre>
+    </div>
+    <ul class="small">
+      <li><b>workflow_dispatch</b> = "can be started by hand". The workflow's page gets a <b>Run workflow</b> button</li>
+      <li>Any finished run also has <b>Re-run all jobs</b> (top right)</li>
+      <li>Use them to re-check a flaky failure or debug the workflow, <b>without</b> junk commits</li>
+    </ul>
+  </div>
+  <p class="bottomline">Without it, GitHub refuses: "Workflow does not have 'workflow_dispatch' trigger".</p>
+  <aside class="notes">
+    <ul>
+      <li>The <b>Run workflow</b> button appears once the workflow with <code>workflow_dispatch</code> is on the default branch (main). Merge first, then show it.</li>
+      <li>Tested: before adding the trigger, starting it by hand failed with that exact message (HTTP 422).</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Workflows are code" data-at="30">
+  <h2>Workflows are code</h2>
+  <ul>
+    <li>Edit them in your editor, commit them, keep their history</li>
+    <li>Change them on a <b>feature branch</b>, open a <b>pull request</b>, get a review</li>
+    <li>Don't assume a workflow works: watch its first run</li>
+  </ul>
+  <p class="bottomline">A broken workflow can let broken code through. Review it like code.</p>
+  <aside class="notes">
+    <p>"History lets you see how the pipeline evolved, and revert it if a change breaks CI."</p>
+  </aside>
+</section>
+
+<!-- ============ DOCKER (32–37) ============ -->
+<section class="slide diagram" data-seg="Docker in a workflow" data-at="32">
+  <img src="../diagrams/GA2-03-native-vs-docker.png" alt="Two ways to run the same tests in CI. Docker answers how do I run my app the same everywhere; workflows answer when should checks run. Native: actions/checkout, actions/setup-node with Node 18, npm install, npm install jest, npm test; faster, simpler, no Dockerfile needed. Docker: actions/checkout, docker build -t app-test, docker run app-test, and the Dockerfile does the rest; the same image as production, works here equals works everywhere. Pick native for a small project, fast feedback, when Docker isn't needed to test. Pick Docker when environment parity matters, there are native dependencies, or production runs in containers. Either way the verdict is the exit code: 0 is a check, anything else is an X.">
+  <div class="src">diagrams/GA2-03-native-vs-docker.tldr</div>
+  <aside class="notes">
+    <p>The curriculum's table: native = small projects, build time matters, fast feedback, Docker not needed. Docker = environment parity critical, native dependencies, production in containers, "works here == works everywhere".</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Docker in a workflow" data-at="34">
+  <h2>The Docker version</h2>
+  <div class="cols" style="grid-template-columns: 1fr 1.05fr; gap:28px">
+    <pre class="yml" style="font-size:19px"><span class="k">name:</span> <span class="v">Run Test Suite</span>
+
+<span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span>
+      - <span class="v">dev</span>
+  <span class="k">pull_request:</span>
+    <span class="k">branches:</span>
+      - <span class="v">main</span>
+  <span class="k">workflow_dispatch:</span>
+
+<span class="k">jobs:</span>
+  <span class="k">test:</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+    <span class="k">steps:</span>
+      - <span class="k">name:</span> <span class="v">Checkout repository</span>
+        <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
+      - <span class="k">name:</span> <span class="v">Build Docker image</span>
+        <span class="k">run:</span> <span class="v">docker build -t app-test .</span>
+      - <span class="k">name:</span> <span class="v">Run tests in container</span>
+        <span class="k">run:</span> <span class="v">docker run app-test</span></pre>
+    <pre class="log" style="font-size:17px"><span class="ok">✓</span> Checkout repository
+<span class="ok">✓</span> Build Docker image
+<span class="ok">✓</span> Run tests in container
+    <span class="cmd">docker run app-test</span>
+    &gt; trial@1.0.0 test
+    &gt; jest
+    PASS ./main.test.js
+    …
+    Tests:       7 passed, 7 total</pre>
+  </div>
+  <aside class="notes">
+    <p><b>** CODE ALONG or YOUR DEMO, about 3 minutes. **</b> Replace run-tests.yml with this (the curriculum's), push to dev. The runner already has Docker. Same 7 passed, ~30 seconds.</p>
+    <p>No setup-node step: the Dockerfile's <code>FROM node:18-alpine</code> brings Node. Real run in kabeier/gh-actions-demo.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Wrap up" data-at="37">
+  <h2>Homework, Part II: add workflows</h2>
+  <p class="small">Go back to every assignment that has a <b>test suite</b>, and add a workflow that runs it:</p>
+  <ul class="small">
+    <li><b>Jest repos</b> (Fibonacci, Linear Search): checkout → setup-node → <code>npm install</code> → <code>npm test</code></li>
+    <li><b>pytest repos</b> (Roman Numerals, Linear Search, Calculator): checkout → setup-python → <code>pip install pytest</code> → <code>pytest</code></li>
+  </ul>
+  <p class="bottomline">Templates are on the class site. Done = a green ✓ on each repo (red until the tests pass is OK).</p>
+  <aside class="notes">
+    <p>Both templates ran green in kabeier/gh-actions-demo (branches template-jest, template-pytest).</p>
+    <p>The earlier JS/Python week specs only print true/false and always exit 0, so a workflow can't fail on them. Use the pytest/Jest repos.</p>
+  </aside>
+</section>
+
+</div>
+<script src="../shared/deck.js"></script>
+<script src="../shared/codepad.js"></script>
+</body>
+</html>
