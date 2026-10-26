@@ -48,7 +48,7 @@ No `schedule:` workflow is in the demo repo on purpose (it would run every night
 | Slide (~min) | Where | Do | Say |
 |---|---|---|---|
 | 1 (0) | Deck | Students: new repo ci-factorial; mkdir, git init, code . | "Today the robot runs our tests." |
-| 3 (3) | Codepad | Terminal: `npm test` (jest not found), `npm install --save-dev jest`, `npm test` (7 passed) | "Confirm it works locally first." |
+| 3 (3) | Codepad | Terminal: `npm test` (jest not found), `npm install --save-dev jest`, `npm test` (7 passed) | "Confirm it works locally first." Click **Dockerfile** / **package.json** in the Explorer to show them (read-only; Esc closes). |
 | 4 (8) | Deck | run-tests.yml in plain English | "Your local workflow, in a clean machine." |
 | 5 (10) | Your VS Code | run-tests.yml, `git checkout -b dev`, push | "Push to dev starts it." |
 | 6 (15) | Browser / deck | Green run, the log | "EBADENGINE = warnings, not errors." |
