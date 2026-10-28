@@ -184,11 +184,11 @@ git push -u origin dev</pre>
     </div>
   </div>
   <aside class="notes">
-    <p><b>** CODE ALONG, about 5 minutes. **</b> New file <code>.github/workflows/run-tests.yml</code> (next to hello-world.yml if they have it). Students copy from Code Lab 2; the YAML is the curriculum's, word for word.</p>
+    <p><b>** CODE ALONG, about 5 minutes. **</b> New file <code>.github/workflows/run-tests.yml</code> (ci-factorial is a new repo, so this is its only workflow). Students copy from Code Lab 2; the YAML is the curriculum's, word for word.</p>
     <ul>
       <li><code>|</code> = "the next lines are one multi-line command".</li>
       <li><code>npm test || (…exit 1)</code>: if the tests fail, print ❌ and fail the step.</li>
-      <li>Push to <b>dev</b> → Actions tab: Run Test Suite starts (and Hello World too, if the repo has it).</li>
+      <li>Push to <b>dev</b> → Actions tab: Run Test Suite starts. (The demo repo also shows a Hello World run: it has both files. Students' ci-factorial doesn't.)</li>
       <li><b>Install Jest step:</b> it's there because the lesson's package.json doesn't list Jest. Students ran <code>npm install --save-dev jest</code> on slide 3, so <b>their</b> package.json lists it: <code>npm install</code> already installs Jest, and this step is harmless. Their log says "added … packages", not "up to date" like slide 6.</li>
       <li>Say: "In your own projects, put Jest in devDependencies with <code>npm install --save-dev jest</code> and drop this step. <code>npm install</code> gets it from there." Better practice: one list of what the project needs, and the same Jest version on your laptop and in CI.</li>
     </ul>
@@ -227,7 +227,7 @@ git push -u origin dev</pre>
       <pre style="font-size:19px; margin-top:12px; padding:12px 16px">git add .
 git commit -m "Break a test"
 git push</pre>
-      <p class="small" style="margin-top:12px">Run Test Suite: <b style="color:var(--red)">✗ failure</b>. Hello World: still ✓.</p>
+      <p class="small" style="margin-top:12px">Run Test Suite: <b style="color:var(--red)">✗ failure</b>.</p>
     </div>
     <pre class="log" style="font-size:16.5px">FAIL ./main.test.js
   tests factorial for small numbers
@@ -252,6 +252,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   <aside class="notes">
     <p><b>** CODE ALONG, about 3 minutes. **</b> Everyone breaks it and pushes. Open the red run → the <b>test</b> job → the red <b>Run tests</b> step.</p>
     <p>Then fix it (<code>toBe(6)</code>), commit, push → green again. Real log from kabeier/gh-actions-demo.</p>
+    <p><b>Demo repo vs students:</b> kabeier/gh-actions-demo also has hello-world.yml, so its Actions tab shows a Hello World run too. Students' <b>ci-factorial</b> is a separate repo with only Run Test Suite.</p>
   </aside>
 </section>
 
@@ -272,11 +273,12 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
 
 <!-- ============ PR, DISPATCH, CODE (25–33) ============ -->
 <section class="slide diagram" data-seg="Pull requests" data-at="25">
-  <img src="../diagrams/GA2-02-dev-pr-main.png" alt="Work on dev, prove it, then merge to main. dev (git push origin dev), then open a pull request dev into main where checks run, then merge into main where only tested code gets. A push to dev runs Run Test Suite and Hello World. The pull_request into main runs Run Test Suite, shown on the PR. The merge is a push to main: Hello World runs, Run Test Suite does not, because its push trigger is dev-only. A red X on the PR says don't merge yet; teams can make it a hard rule in Settings, Branches, require status checks.">
+  <img src="../diagrams/GA2-02-dev-pr-main.png?v=2" alt="Work on dev, prove it, then merge to main. dev (git push origin dev), then open a pull request dev into main where checks run, then merge into main after a green check. A push to dev runs Run Test Suite. The pull_request into main runs Run Test Suite, shown on the PR. The merge is a push to main: Run Test Suite does not run, because its push trigger is dev-only. A red X on the PR only warns: you can still merge. Next slide: a branch rule that blocks it.">
   <div class="src">diagrams/GA2-02-dev-pr-main.tldr</div>
   <aside class="notes">
     <p><b>** LIVE, about 3 minutes. **</b> github.com → your repo → <b>Compare &amp; pull request</b> (dev → main) → the checks appear at the bottom of the PR. Wait for ✓, then <b>Merge</b>.</p>
     <p>Backup: <a href="https://github.com/kabeier/gh-actions-demo/pull/1">kabeier/gh-actions-demo PR #1</a>.</p>
+    <p>Students' ci-factorial has only Run Test Suite. The demo repo backup also shows Hello World runs (it has both files).</p>
     <p>A red ✗ here only <b>warns</b>; the next slide shows how a branch rule <b>blocks</b> the merge.</p>
   </aside>
 </section>
