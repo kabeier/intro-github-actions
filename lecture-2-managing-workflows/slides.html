@@ -277,6 +277,22 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   <aside class="notes">
     <p><b>** LIVE, about 3 minutes. **</b> github.com → your repo → <b>Compare &amp; pull request</b> (dev → main) → the checks appear at the bottom of the PR. Wait for ✓, then <b>Merge</b>.</p>
     <p>Backup: <a href="https://github.com/kabeier/gh-actions-demo/pull/1">kabeier/gh-actions-demo PR #1</a>.</p>
+    <p><b>"Does a red ✗ stop the merge?"</b> Not on its own. The workflow only <b>reports</b>: tests run on the PR and show ✓ or ✗, but the <b>Merge</b> button still works on red (just a warning). A <b>branch rule</b> is what <b>enforces</b> it.</p>
+    <table style="border-collapse:collapse;margin:10px 0 6px">
+      <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a" align="left"></th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">no rule (our repos)</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">rule: require the check</th></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">tests run on the PR</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">red ✗ shows on the PR</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">merge on red?</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><b>yes</b>, with a warning</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><b>no</b>, button greyed out</td></tr>
+    </table>
+    <p><b>Make it block</b> (if asked; it's an extra in Code Lab 2):</p>
+    <ol>
+      <li>Repo → <b>Settings</b> → <b>Branches</b> (newer: <b>Rules → Rulesets</b>)</li>
+      <li>Add a rule for <b>main</b></li>
+      <li>Turn on <b>Require status checks to pass</b></li>
+      <li>Pick the check <b>test</b> (the job name in run-tests.yml)</li>
+    </ol>
+    <p>Gotchas: the check is only in the list <b>after it has run once</b>. Rules are free on <b>public</b> repos; private repos need a paid plan.</p>
+    <p>Say: "The workflow <b>reports</b>, a branch rule <b>enforces</b>. Without the rule, red is just a warning."</p>
   </aside>
 </section>
 
