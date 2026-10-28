@@ -36,12 +36,12 @@ No `schedule:` workflow is in the demo repo on purpose (it would run every night
 | 9 (14) | Your VS Code | Type hello-world.yml, commit, push | "This proves the automation works." |
 | 10 (18) | Browser | Actions tab → the run → say-hello → Print a message | "Thumbs up for a green ✓." |
 | 11 (20) | Deck | The real log | "Command, then what it printed." |
-| 12 (21) | Activity page | 6 cards | "RUNS or DOESN'T RUN." |
-| 13 (27) | Deck | Triggers table | "For pull_request, the filter is the TARGET branch." |
+| 12 (21) | Deck | Triggers table | "For pull_request, the filter is the TARGET branch." |
+| 13 (24) | Activity page | 6 cards | "RUNS or DOESN'T RUN." |
 | 14 (30) | Your terminal + browser | `branches: - main`, push; then push try-filter → no run | "No run is the correct result." |
 | 15 (36) | Deck | Homework Part I | "Every push, every branch, Ubuntu, echo." |
 
-**Time check, Lecture 1:** not at the activity by ~min 23 → show slide 11 instead of waiting for everyone's runs. Students' pushes failing (auth) → "watch mine; Code Lab 1 has every step".
+**Time check, Lecture 1:** not at the triggers slide by ~min 23 → show slide 11 instead of waiting for everyone's runs. Students' pushes failing (auth) → "watch mine; Code Lab 1 has every step".
 
 ## Lecture 2 in class (Managing Workflows)
 

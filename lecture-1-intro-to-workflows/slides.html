@@ -210,7 +210,7 @@ code .</pre>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on: push: branches: - main</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td></tr>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on: pull_request:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td></tr>
     </table>
-    <p>Say: "<code>on:</code> is the robot's alarm clock. GitHub checks every file's alarm, and only the files whose alarm matches what just happened wake up." The activity (slide 12) is this question 10 times; branches come on slide 13.</p>
+    <p>Say: "<code>on:</code> is the robot's alarm clock. GitHub checks every file's alarm, and only the files whose alarm matches what just happened wake up." The triggers table (slide 12) shows more, then the activity (slide 13) is this question 10 times.</p>
   </aside>
 </section>
 
@@ -234,23 +234,8 @@ code .</pre>
   </aside>
 </section>
 
-<!-- ============ ACTIVITY (21–27) ============ -->
-<section class="slide activity" data-seg="Activity: Will it run?" data-at="21">
-  <h2>Activity: Will it run?</h2>
-  <div class="countdown" data-sec="360"></div>
-  <ol class="steps">
-    <li>You see a workflow's <code>on:</code> block, and something that happens</li>
-    <li>In chat on "go": <b>RUNS</b> or <b>DOESN'T RUN</b></li>
-    <li>Branches listed under a trigger are a filter</li>
-  </ol>
-  <p class="muted small" style="margin-top:24px">Page: activity-will-it-run/</p>
-  <aside class="notes">
-    <p>About 30 seconds a card; the first 6 are the core set. Answers were checked on real runs in kabeier/gh-actions-demo (the midnight cron card is from GitHub's docs).</p>
-  </aside>
-</section>
-
-<!-- ============ TRIGGERS (27–37) ============ -->
-<section class="slide" data-seg="Triggers" data-at="27">
+<!-- ============ TRIGGERS (21–24) ============ -->
+<section class="slide" data-seg="Triggers" data-at="21">
   <h2><code>on:</code> decides when the robot works</h2>
   <table class="dbt tri">
     <tr><th>You want…</th><th>on:</th><th>Typical use</th></tr>
@@ -272,6 +257,21 @@ code .</pre>
       <li>Cron fields: minute hour day month weekday. <code>0 0 * * *</code> = 00:00 UTC daily (that's 7 or 8 pm Eastern the evening before).</li>
       <li>Why conditions matter: fewer pointless runs, lower cost, matches your git strategy, no accidental deploys.</li>
     </ul>
+  </aside>
+</section>
+
+<!-- ============ ACTIVITY (24–30), BRANCH FILTER (30–36) ============ -->
+<section class="slide activity" data-seg="Activity: Will it run?" data-at="24">
+  <h2>Activity: Will it run?</h2>
+  <div class="countdown" data-sec="360"></div>
+  <ol class="steps">
+    <li>You see a workflow's <code>on:</code> block, and something that happens</li>
+    <li>In chat on "go": <b>RUNS</b> or <b>DOESN'T RUN</b></li>
+    <li>Branches listed under a trigger are a filter</li>
+  </ol>
+  <p class="muted small" style="margin-top:24px">Page: activity-will-it-run/</p>
+  <aside class="notes">
+    <p>About 30 seconds a card; the first 6 are the core set. Answers were checked on real runs in kabeier/gh-actions-demo (the midnight cron card is from GitHub's docs).</p>
   </aside>
 </section>
 
