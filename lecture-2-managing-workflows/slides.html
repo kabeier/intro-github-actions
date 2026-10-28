@@ -180,6 +180,7 @@ npm test</pre>
 git add .
 git commit -m "Run tests in CI"
 git push -u origin dev</pre>
+      <p class="muted" style="margin-top:12px; font-size:21px; line-height:1.4">Your own projects: Jest in package.json (<code style="white-space:nowrap">--save-dev</code>), so <b>npm install</b> gets it. No Install Jest step.</p>
     </div>
   </div>
   <aside class="notes">
@@ -188,6 +189,8 @@ git push -u origin dev</pre>
       <li><code>|</code> = "the next lines are one multi-line command".</li>
       <li><code>npm test || (…exit 1)</code>: if the tests fail, print ❌ and fail the step.</li>
       <li>Push to <b>dev</b> → Actions tab: Run Test Suite starts (and Hello World too, if the repo has it).</li>
+      <li><b>Install Jest step:</b> it's there because the lesson's package.json doesn't list Jest. Students ran <code>npm install --save-dev jest</code> on slide 3, so <b>their</b> package.json lists it: <code>npm install</code> already installs Jest, and this step is harmless. Their log says "added … packages", not "up to date" like slide 6.</li>
+      <li>Say: "In your own projects, put Jest in devDependencies with <code>npm install --save-dev jest</code> and drop this step. <code>npm install</code> gets it from there." Better practice: one list of what the project needs, and the same Jest version on your laptop and in CI.</li>
     </ul>
   </aside>
 </section>
