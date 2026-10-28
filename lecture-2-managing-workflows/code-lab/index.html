@@ -271,7 +271,7 @@ Error: Process completed with exit code 1.</pre>
       <li>At the bottom of the PR, the <b>Run Test Suite</b> check runs (event: pull_request). Wait for ✓, then <b>Merge pull request</b>.</li>
       <li>The merge is a push to main: Run Test Suite does <b>not</b> run for it (its push trigger is dev only).</li>
     </ol>
-    <p class="note">Want a red check to actually block merging? Settings → Branches → add a rule for main → require status checks to pass.</p>
+    <p class="note">A red check only <b>warns</b>: you can still merge. To <b>block</b> merging on red: Settings → Branches → <b>Add classic branch protection rule</b> → branch name pattern <b>main</b> → tick <b>Require status checks to pass before merging</b> and search <b>test</b> → tick <b>Do not allow bypassing the above settings</b> (you are the admin, and admins can skip rules otherwise) → <b>Create</b>. The <b>test</b> check only shows up after it has run once. Free on <b>public</b> repos; <b>private</b> repos need a paid plan (GitHub Pro).</p>
   </section>
 
   <section id="s6">

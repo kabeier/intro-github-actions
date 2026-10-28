@@ -56,9 +56,10 @@ No `schedule:` workflow is in the demo repo on purpose (it would run every night
 | 7 (17) | Your VS Code + browser | toBe(7), push, red; read it; fix, push | "Exit code 1 = red." |
 | 8 (19) | Activity page | 6 cards | "Test failed, broken YAML, or missing step?" |
 | 9 (25) | Browser | PR dev → main, wait for the check, merge | "Only tested code reaches main." |
-| 10 (28) | Deck + browser | workflow_dispatch; Run workflow / Re-run all jobs | "Re-run without junk commits." |
-| 11 (30) | Deck | Workflows are code | "Branch, PR, review." |
-| 12–13 (32–34) | Deck + your VS Code | Native vs Docker; push the Docker version | "Docker = how to run it; workflows = when." |
-| 14 (37) | Deck | Homework Part II | "Templates are on the class site." |
+| 10 (27) | Deck | Branch protection: warn vs block, free on public | "The workflow reports. A branch rule enforces." |
+| 11 (29) | Deck + browser | workflow_dispatch; Run workflow / Re-run all jobs | "Re-run without junk commits." |
+| 12 (31) | Deck | Workflows are code | "Branch, PR, review." |
+| 13–14 (32–34) | Deck + your VS Code | Native vs Docker; push the Docker version | "Docker = how to run it; workflows = when." |
+| 15 (37) | Deck | Homework Part II | "Templates are on the class site." |
 
-**Time check, Lecture 2:** not at the activity by ~min 21 → skip the live fix in slide 7 (show the demo repo's green run). Not at slide 12 by ~min 34 → show the Docker slide only; students do it from Code Lab 2.
+**Time check, Lecture 2:** not at the activity by ~min 21 → skip the live fix in slide 7 (show the demo repo's green run). Not at slide 13 by ~min 34 → show the Docker slide only; students do it from Code Lab 2.

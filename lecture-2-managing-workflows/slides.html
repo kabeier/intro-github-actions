@@ -277,26 +277,57 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   <aside class="notes">
     <p><b>** LIVE, about 3 minutes. **</b> github.com → your repo → <b>Compare &amp; pull request</b> (dev → main) → the checks appear at the bottom of the PR. Wait for ✓, then <b>Merge</b>.</p>
     <p>Backup: <a href="https://github.com/kabeier/gh-actions-demo/pull/1">kabeier/gh-actions-demo PR #1</a>.</p>
-    <p><b>"Does a red ✗ stop the merge?"</b> Not on its own. The workflow only <b>reports</b>: tests run on the PR and show ✓ or ✗, but the <b>Merge</b> button still works on red (just a warning). A <b>branch rule</b> is what <b>enforces</b> it.</p>
+    <p>A red ✗ here only <b>warns</b>; the next slide shows how a branch rule <b>blocks</b> the merge.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Pull requests: branch protection" data-at="27">
+  <h2>A red ✗ warns. A rule blocks.</h2>
+  <div class="cols" style="grid-template-columns:1.3fr 1fr; gap:40px">
+    <div>
+      <table class="dbt tri" style="width:100%">
+        <tr><th></th><th>Our workflows</th><th>+ branch rule</th></tr>
+        <tr><td>Tests run on the PR</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Red ✗ on the PR</td><td>✅</td><td>✅</td></tr>
+        <tr><td><b>Merge on red?</b></td><td><b>Yes</b>, a warning</td><td><b>No</b>, blocked</td></tr>
+      </table>
+      <ul class="small" style="margin-top:22px">
+        <li><b>Free</b> on <b>public</b> repos</li>
+        <li><b>Private</b> repos need a paid plan (GitHub Pro)</li>
+      </ul>
+    </div>
+    <div>
+      <p class="small" style="margin-bottom:8px"><b>Protect main</b></p>
+      <ol class="steps small">
+        <li>Repo → <b>Settings</b> → <b>Branches</b></li>
+        <li><b>Add classic branch protection rule</b></li>
+        <li>Branch name pattern: <b>main</b></li>
+        <li>✔ <b>Require status checks to pass before merging</b> → search <b>test</b></li>
+        <li>✔ <b>Do not allow bypassing the above settings</b></li>
+        <li><b>Create</b></li>
+      </ol>
+    </div>
+  </div>
+  <p class="bottomline">The workflow reports. A branch rule enforces.</p>
+  <aside class="notes">
+    <p><b>About 2 minutes.</b> Explain; don't do it live (it's an extra in Code Lab 2).</p>
+    <ul>
+      <li>Say: "Everything we built today <b>warns</b>. GitHub shows the red ✗ on the PR, but the Merge button still works. Teams add a <b>branch rule</b> so red can't be merged."</li>
+      <li><b>test</b> = the job name in run-tests.yml. It only shows up in the search <b>after it has run once</b>.</li>
+      <li><b>Step 5 matters for you:</b> you're the admin of your own repo, and admins can bypass the rule by default. This box removes that.</li>
+      <li>Newer menus also offer <b>Rules → Rulesets</b>: same idea, more options.</li>
+      <li>Plans: GitHub Free has the full feature set on <b>public</b> repos; protected branches in <b>private</b> repos need Pro, Team or Enterprise (GitHub docs).</li>
+    </ul>
     <table style="border-collapse:collapse;margin:10px 0 6px">
       <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a" align="left"></th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">no rule (our repos)</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">rule: require the check</th></tr>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">tests run on the PR</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td></tr>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">red ✗ shows on the PR</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅</td></tr>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">merge on red?</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><b>yes</b>, with a warning</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><b>no</b>, button greyed out</td></tr>
     </table>
-    <p><b>Make it block</b> (if asked; it's an extra in Code Lab 2):</p>
-    <ol>
-      <li>Repo → <b>Settings</b> → <b>Branches</b> (newer: <b>Rules → Rulesets</b>)</li>
-      <li>Add a rule for <b>main</b></li>
-      <li>Turn on <b>Require status checks to pass</b></li>
-      <li>Pick the check <b>test</b> (the job name in run-tests.yml)</li>
-    </ol>
-    <p>Gotchas: the check is only in the list <b>after it has run once</b>. Rules are free on <b>public</b> repos; private repos need a paid plan.</p>
-    <p>Say: "The workflow <b>reports</b>, a branch rule <b>enforces</b>. Without the rule, red is just a warning."</p>
   </aside>
 </section>
 
-<section class="slide" data-seg="Manual runs" data-at="28">
+<section class="slide" data-seg="Manual runs" data-at="29">
   <h2>Run it again without a new commit</h2>
   <div class="cols" style="gap:34px">
     <div>
@@ -325,7 +356,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </aside>
 </section>
 
-<section class="slide" data-seg="Workflows are code" data-at="30">
+<section class="slide" data-seg="Workflows are code" data-at="31">
   <h2>Workflows are code</h2>
   <ul>
     <li>Edit them in your editor, commit them, keep their history</li>

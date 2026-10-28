@@ -11,7 +11,7 @@ Lecture site for Code Platoon Phase I, **Fundamentals: GitHub Actions**: workflo
 - **Code lab:** `lecture-1-intro-to-workflows/code-lab/`
 - **Activity:** `lecture-1-intro-to-workflows/activity-will-it-run/`
 
-## Lecture 2: Managing Workflows (~40 min, 14 slides)
+## Lecture 2: Managing Workflows (~40 min, 15 slides)
 
 - **Slides:** `lecture-2-managing-workflows/slides.html`
 - **Code lab:** `lecture-2-managing-workflows/code-lab/`
