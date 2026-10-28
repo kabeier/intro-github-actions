@@ -139,7 +139,8 @@ git push -u origin main</code></pre><button type="button" class="copy">Copy</but
       - main
   workflow_dispatch:</code></pre><button type="button" class="copy">Copy</button></div>
         <code>workflow_dispatch:</code> lines up with <code>push:</code>, with nothing after the colon. It adds a <b>Run workflow</b> button.
-        <div class="cmdwrap"><pre class="cmd"><code>git commit -am &quot;Only run on main&quot;
+        <div class="cmdwrap"><pre class="cmd"><code>git add .
+git commit -m &quot;Only run on main&quot;
 git push</code></pre><button type="button" class="copy">Copy</button></div>
         Actions: a new run, for <b>main</b>.</li>
       <li>Now push a different branch:
