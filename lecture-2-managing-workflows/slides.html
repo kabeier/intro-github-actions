@@ -131,7 +131,7 @@ npm test</pre>
 </section>
 
 <section class="slide diagram" data-seg="run-tests.yml" data-at="8">
-  <img src="../diagrams/GA2-01-run-tests-plain.png" alt="run-tests.yml in plain English. The YAML: on push to branch dev, and pull_request to branch main; jobs, test, runs-on ubuntu-latest; steps: uses actions/checkout@v4; uses actions/setup-node@v4 with node-version 18; run npm install; run npm install jest; run npm test or else echo Tests failed and exit 1. In plain English: when a push to dev or a PR into main; where a fresh Ubuntu machine; 1, copy this project; 2, set up Node 18; 3, install dependencies and Jest; 4, run the tests, where exit 1 means a red X. uses: is a ready-made action from the Marketplace; run: is a terminal command you write.">
+  <img src="../diagrams/GA2-01-run-tests-plain.png?v=2" alt="run-tests.yml in plain English. The YAML: on push to branch dev, and pull_request to branch main; jobs, test, runs-on ubuntu-latest; steps: uses actions/checkout@v7; uses actions/setup-node@v7 with node-version 18; run npm install; run npm install jest; run npm test or else echo Tests failed and exit 1. In plain English: when a push to dev or a PR into main; where a fresh Ubuntu machine; 1, copy this project; 2, set up Node 18; 3, install dependencies and Jest; 4, run the tests, where exit 1 means a red X. uses: is a ready-made action from the Marketplace; run: is a terminal command you write.">
   <div class="src">diagrams/GA2-01-run-tests-plain.tldr</div>
   <aside class="notes">
     <p>"In Ubuntu: copy this project, set up Node, install, run the tests." That's the curriculum's recipe, line for line.</p>
@@ -160,10 +160,10 @@ npm test</pre>
 
     <span class="k">steps:</span>
       - <span class="k">name:</span> <span class="v">Checkout repository</span>
-        <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
+        <span class="k">uses:</span> <span class="v">actions/checkout@v7</span>
 
       - <span class="k">name:</span> <span class="v">Set up Node.js</span>
-        <span class="k">uses:</span> <span class="v">actions/setup-node@v4</span>
+        <span class="k">uses:</span> <span class="v">actions/setup-node@v7</span>
         <span class="k">with:</span>
           <span class="k">node-version:</span> <span class="v">18</span></pre>
     <div>
@@ -180,7 +180,7 @@ npm test</pre>
 git add .
 git commit -m "Run tests in CI"
 git push -u origin dev</pre>
-      <p class="muted" style="margin-top:12px; font-size:21px; line-height:1.4">Your own projects: Jest in package.json (<code style="white-space:nowrap">--save-dev</code>), so <b>npm install</b> gets it. No Install Jest step.</p>
+      <p class="muted" style="margin-top:10px; font-size:18px; line-height:1.35">We use the current versions (<b>@v7</b>); the curriculum shows @v4, both work.<br>Your own projects: Jest in package.json (<code style="white-space:nowrap">--save-dev</code>), so <b>npm install</b> gets it. No Install Jest step.</p>
     </div>
   </div>
   <aside class="notes">
@@ -192,19 +192,19 @@ git push -u origin dev</pre>
       <li><b>Install Jest step:</b> it's there because the lesson's package.json doesn't list Jest. Students ran <code>npm install --save-dev jest</code> on slide 3, so <b>their</b> package.json lists it: <code>npm install</code> already installs Jest, and this step is harmless. Their log says "added … packages", not "up to date" like slide 6.</li>
       <li>Say: "In your own projects, put Jest in devDependencies with <code>npm install --save-dev jest</code> and drop this step. <code>npm install</code> gets it from there." Better practice: one list of what the project needs, and the same Jest version on your laptop and in CI.</li>
     </ul>
-    <p><b>"What's the @v4?"</b> <code>uses: actions/checkout@v4</code> = run the code in the repo <b>github.com/actions/checkout</b>, at its tag <b>v4</b>. Same idea as a Docker tag: <code>node:18</code>.</p>
+    <p><b>"What's the @v7?"</b> <code>uses: actions/checkout@v7</code> = run the code in the repo <b>github.com/actions/checkout</b>, at its tag <b>v7</b>. Same idea as a Docker tag: <code>node:18</code>.</p>
     <table style="border-collapse:collapse;margin:10px 0 6px">
       <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">you write</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">you get</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">like Docker</th></tr>
-      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@v4</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">newest <b>v4.x.x</b>: bug fixes, nothing breaking. <b>Most common</b></td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:18</code></td></tr>
-      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@v4.2.2</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">that exact release, never changes</td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:18.20.4</code></td></tr>
-      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@11d5960…</code> (commit)</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">locked to one commit. Security-minded teams</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">image digest</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@v7</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">newest <b>v7.x.x</b>: bug fixes, nothing breaking. <b>Most common</b></td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:18</code></td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@v7.0.1</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">that exact release, never changes</td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:18.20.4</code></td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@3d3c42e…</code> (commit)</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">locked to one commit. Security-minded teams</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">image digest</td></tr>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@main</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">whatever is newest today. <b>Avoid</b>: can break any time</td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:latest</code></td></tr>
       </table>
     <ul>
       <li><b>How to pick:</b> the action's Marketplace page or its repo's <b>Releases</b> → use the newest <b>major</b> (the number after <code>v</code>).</li>
-      <li><b>Why v4 here:</b> it's the curriculum's YAML, and it still works. Today (Oct 2026) the newest is <b>v7</b> for checkout and setup-node.</li>
-      <li><b>They will see a yellow warning</b> on the run: "Node.js 20 is deprecated … actions/checkout@v4 … forced to run on Node.js 24" (seen on the demo repo). A <b>warning, not an error</b>: the run is still green. In their own projects, a newer major makes it go away.</li>
-      <li>Say: "<b>@v4</b> is like a Docker tag. It picks which version of someone else's code runs. Use the newest major from the action's Releases page."</li>
+      <li><b>Why v7, not the curriculum's v4:</b> v7 is the newest major today (Oct 2026) for checkout, setup-node and setup-python. The slide says so at the bottom. Same YAML otherwise.</li>
+      <li><b>If a student copies @v4 from the curriculum:</b> it still works, with a yellow warning "Node.js 20 is deprecated … actions/checkout@v4 … forced to run on Node.js 24". A <b>warning, not an error</b>: the run stays green. Seen on the demo repo before the switch.</li>
+      <li>Say: "<b>@v7</b> is like a Docker tag. It picks which version of someone else's code runs. Use the newest major from the action's Releases page."</li>
     </ul>
   </aside>
 </section>
@@ -413,7 +413,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
     <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
     <span class="k">steps:</span>
       - <span class="k">name:</span> <span class="v">Checkout repository</span>
-        <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
+        <span class="k">uses:</span> <span class="v">actions/checkout@v7</span>
       - <span class="k">name:</span> <span class="v">Build Docker image</span>
         <span class="k">run:</span> <span class="v">docker build -t app-test .</span>
       - <span class="k">name:</span> <span class="v">Run tests in container</span>
@@ -428,16 +428,17 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
     …
     Tests:       7 passed, 7 total</pre>
   </div>
+  <p class="small muted" style="margin-top:10px; font-size:19px; max-width:none">We use the current versions (<b>@v7</b>). The curriculum shows @v4: both work.</p>
   <aside class="notes">
     <p><b>** CODE ALONG or YOUR DEMO, about 3 minutes. **</b> Replace run-tests.yml with this (the curriculum's), push to dev. The runner already has Docker. Same 7 passed, ~30 seconds.</p>
     <p>No setup-node step: the Dockerfile's <code>FROM node:18-alpine</code> brings Node. Real run in kabeier/gh-actions-demo.</p>
   </aside>
 </section>
 
-<section class="slide" data-seg="Reference" data-at="36">
+<section c<section class="slide" data-seg="Reference" data-at="36">
   <h2>Cheat sheet: a workflow file</h2>
   <div class="cols" style="grid-template-columns:0.85fr 1.15fr; gap:22px">
-    <pre class="yml" style="font-size:19px; line-height:1.42; padding:16px 20px"><span class="k">name:</span> <span class="v">CI</span>                  <span class="c"># Actions tab label</span>
+    <div><pre class="yml" style="font-size:19px; line-height:1.42; padding:16px 20px"><span class="k">name:</span> <span class="v">CI</span>                  <span class="c"># Actions tab label</span>
 
 <span class="k">on:</span>                       <span class="c"># WHEN it runs</span>
   <span class="k">push:</span>
@@ -450,12 +451,13 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
 
 <span class="k">env:</span>                      <span class="c"># variables</span>
   <span class="k">NODE_ENV:</span> <span class="v">test</span>          <span class="c"># for every job</span></pre>
+    <p class="small muted" style="margin-top:10px; font-size:19px; max-width:none">We use the current versions (<b>@v7</b>). The curriculum shows @v4: both work.</p></div>
     <pre class="yml" style="font-size:19px; line-height:1.42; padding:16px 20px"><span class="k">jobs:</span>
   <span class="k">test:</span>                         <span class="c"># job id = check name</span>
     <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>      <span class="c"># WHERE</span>
     <span class="k">steps:</span>                      <span class="c"># HOW, in order</span>
-      - <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
-      - <span class="k">uses:</span> <span class="v">actions/setup-node@v4</span>
+      - <span class="k">uses:</span> <span class="v">actions/checkout@v7</span>
+      - <span class="k">uses:</span> <span class="v">actions/setup-node@v7</span>
         <span class="k">with:</span>                   <span class="c"># inputs to the action</span>
           <span class="k">node-version:</span> <span class="v">18</span>
       - <span class="k">run:</span> <span class="v">npm install</span>        <span class="c"># a terminal command</span>

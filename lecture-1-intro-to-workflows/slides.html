@@ -107,10 +107,11 @@
     <tr><th></th><th>Docker</th><th>GitHub Actions</th></tr>
     <tr><td><b>Ready-made pieces</b></td><td>images</td><td class="pk">actions</td></tr>
     <tr><td><b>Where to find them</b></td><td>Docker Hub</td><td><a href="https://github.com/marketplace?type=actions" target="_blank" rel="noopener">GitHub Marketplace</a></td></tr>
-    <tr><td><b>Use one</b></td><td>FROM node:18-alpine</td><td class="pk">uses: actions/setup-node@v4</td></tr>
+    <tr><td><b>Use one</b></td><td>FROM node:18-alpine</td><td class="pk">uses: actions/setup-node@v7</td></tr>
     <tr><td><b>Official ones</b></td><td>node, python</td><td>actions/checkout · actions/setup-node · actions/setup-python</td></tr>
   </table>
-  <p class="bottomline">Reuse trusted actions. Pin the version (@v4), like you pin an image tag.</p>
+  <p class="small muted" style="margin-top:10px; font-size:19px; max-width:none">We use the current versions (<b>@v7</b>). The curriculum shows @v4: both work.</p>
+  <p class="bottomline">Reuse trusted actions. Pin the version (@v7), like you pin an image tag.</p>
   <aside class="notes">
     <p>Open the Marketplace for 30 seconds: search "setup-node", show the verified badge (like Docker's Official Image badge).</p>
     <p>"Same habit as Docker: official, maintained, pinned."</p>
