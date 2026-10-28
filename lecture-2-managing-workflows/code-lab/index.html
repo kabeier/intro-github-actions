@@ -340,8 +340,66 @@ git push</code></pre><button type="button" class="copy">Copy</button></div>
       <tr><td><b>Build Docker image:</b> <code>failed to read dockerfile: open Dockerfile: no such file or directory</code></td><td>No checkout, or no Dockerfile in the repo</td><td>Checkout first; commit the Dockerfile</td></tr>
       <tr><td><code>Invalid workflow file … yaml syntax on line N</code></td><td>Indentation or a tab</td><td>Spaces only, keys lined up</td></tr>
       <tr><td>Run Test Suite didn't run</td><td>You pushed to a branch it doesn't watch</td><td>It runs on pushes to <b>dev</b> and PRs into <b>main</b></td></tr>
+      <tr><td>Yellow warning: <code>Node.js 20 is deprecated … actions/checkout@v4</code></td><td>A warning, not an error: the run is still green</td><td>Nothing for class. In your own projects, use a newer major (the action's Releases page)</td></tr>
       <tr><td>No "Run workflow" button</td><td>No <code>workflow_dispatch</code>, or it isn't on main yet</td><td>Add it under <code>on:</code>, merge to main</td></tr>
     </table>
+  </section>
+
+  <section id="cheat">
+    <h2>Cheat sheet: a workflow file</h2>
+    <p>Every key we used, plus a few you'll meet later. This exact file passes <b>actionlint</b> (the GitHub Actions linter).</p>
+    <div class="cmdwrap"><pre class="cmd"><code>name: CI                  # Actions tab label
+
+on:                       # WHEN it runs
+  push:
+    branches: [dev]       # same as - dev
+  pull_request:
+    branches: [main]      # the PR&#x27;s target
+  schedule:
+    - cron: &quot;0 0 * * *&quot;   # daily, 00:00 UTC
+  workflow_dispatch:      # Run workflow button
+
+env:                      # variables
+  NODE_ENV: test          # for every job
+
+jobs:
+  test:                         # job id = check name
+    runs-on: ubuntu-latest      # WHERE
+    steps:                      # HOW, in order
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:                   # inputs to the action
+          node-version: 18
+      - run: npm install        # a terminal command
+      - name: Run tests         # label in the log
+        run: |                  # several lines
+          npm test
+          echo &quot;done&quot;
+
+  deploy:
+    needs: test                 # waits for test ✓
+    if: github.ref == &#x27;refs/heads/main&#x27;
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo &quot;Deploying&quot;</code></pre><button type="button" class="copy">Copy</button></div>
+    <table>
+      <tr><th>Key</th><th>Means</th></tr>
+      <tr><td><code>name:</code></td><td>the workflow's name in the Actions tab</td></tr>
+      <tr><td><code>on:</code></td><td>WHEN: the events that start it. Any one of them is enough</td></tr>
+      <tr><td><code>branches: [dev]</code></td><td>short form of a list: same as <code>- dev</code> on the next line</td></tr>
+      <tr><td><code>schedule: - cron:</code></td><td>on a timer: minute hour day month weekday, in UTC</td></tr>
+      <tr><td><code>workflow_dispatch:</code></td><td>adds the <b>Run workflow</b> button</td></tr>
+      <tr><td><code>env:</code></td><td>variables every step can read, e.g. <code>$NODE_ENV</code></td></tr>
+      <tr><td><code>jobs: test:</code></td><td>a job. Its id (<code>test</code>) is the check name on pull requests</td></tr>
+      <tr><td><code>runs-on:</code></td><td>WHERE: the runner machine</td></tr>
+      <tr><td><code>steps:</code></td><td>HOW: run top to bottom. One fails = the job stops</td></tr>
+      <tr><td><code>uses: … with:</code></td><td>a ready-made action from the Marketplace, and its inputs</td></tr>
+      <tr><td><code>@v4</code></td><td>which version of the action: the newest v4.x.x. Check the action's Releases for the newest major</td></tr>
+      <tr><td><code>run: |</code></td><td>terminal commands; <code>|</code> = several lines</td></tr>
+      <tr><td><code>needs: test</code></td><td>this job waits for <code>test</code> to pass (jobs run at the same time otherwise)</td></tr>
+      <tr><td><code>if:</code></td><td>run only when the condition is true (here: on main)</td></tr>
+    </table>
+    <p class="note">Indent = "belongs to". Spaces only, never tabs.</p>
   </section>
 
 </main>

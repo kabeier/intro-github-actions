@@ -192,6 +192,20 @@ git push -u origin dev</pre>
       <li><b>Install Jest step:</b> it's there because the lesson's package.json doesn't list Jest. Students ran <code>npm install --save-dev jest</code> on slide 3, so <b>their</b> package.json lists it: <code>npm install</code> already installs Jest, and this step is harmless. Their log says "added … packages", not "up to date" like slide 6.</li>
       <li>Say: "In your own projects, put Jest in devDependencies with <code>npm install --save-dev jest</code> and drop this step. <code>npm install</code> gets it from there." Better practice: one list of what the project needs, and the same Jest version on your laptop and in CI.</li>
     </ul>
+    <p><b>"What's the @v4?"</b> <code>uses: actions/checkout@v4</code> = run the code in the repo <b>github.com/actions/checkout</b>, at its tag <b>v4</b>. Same idea as a Docker tag: <code>node:18</code>.</p>
+    <table style="border-collapse:collapse;margin:10px 0 6px">
+      <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">you write</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">you get</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">like Docker</th></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@v4</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">newest <b>v4.x.x</b>: bug fixes, nothing breaking. <b>Most common</b></td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:18</code></td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@v4.2.2</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">that exact release, never changes</td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:18.20.4</code></td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@11d5960…</code> (commit)</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">locked to one commit. Security-minded teams</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">image digest</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>@main</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">whatever is newest today. <b>Avoid</b>: can break any time</td><td style="padding:4px 16px;border-bottom:1px solid #34405a"><code>node:latest</code></td></tr>
+      </table>
+    <ul>
+      <li><b>How to pick:</b> the action's Marketplace page or its repo's <b>Releases</b> → use the newest <b>major</b> (the number after <code>v</code>).</li>
+      <li><b>Why v4 here:</b> it's the curriculum's YAML, and it still works. Today (Oct 2026) the newest is <b>v7</b> for checkout and setup-node.</li>
+      <li><b>They will see a yellow warning</b> on the run: "Node.js 20 is deprecated … actions/checkout@v4 … forced to run on Node.js 24" (seen on the demo repo). A <b>warning, not an error</b>: the run is still green. In their own projects, a newer major makes it go away.</li>
+      <li>Say: "<b>@v4</b> is like a Docker tag. It picks which version of someone else's code runs. Use the newest major from the action's Releases page."</li>
+    </ul>
   </aside>
 </section>
 
@@ -417,6 +431,69 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   <aside class="notes">
     <p><b>** CODE ALONG or YOUR DEMO, about 3 minutes. **</b> Replace run-tests.yml with this (the curriculum's), push to dev. The runner already has Docker. Same 7 passed, ~30 seconds.</p>
     <p>No setup-node step: the Dockerfile's <code>FROM node:18-alpine</code> brings Node. Real run in kabeier/gh-actions-demo.</p>
+  </aside>
+</section>
+
+<section class="slide" data-seg="Reference" data-at="36">
+  <h2>Cheat sheet: a workflow file</h2>
+  <div class="cols" style="grid-template-columns:0.85fr 1.15fr; gap:22px">
+    <pre class="yml" style="font-size:19px; line-height:1.42; padding:16px 20px"><span class="k">name:</span> <span class="v">CI</span>                  <span class="c"># Actions tab label</span>
+
+<span class="k">on:</span>                       <span class="c"># WHEN it runs</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span> <span class="v">[dev]</span>       <span class="c"># same as - dev</span>
+  <span class="k">pull_request:</span>
+    <span class="k">branches:</span> <span class="v">[main]</span>      <span class="c"># the PR's target</span>
+  <span class="k">schedule:</span>
+    - <span class="k">cron:</span> <span class="v">"0 0 * * *"</span>   <span class="c"># daily, 00:00 UTC</span>
+  <span class="k">workflow_dispatch:</span>      <span class="c"># Run workflow button</span>
+
+<span class="k">env:</span>                      <span class="c"># variables</span>
+  <span class="k">NODE_ENV:</span> <span class="v">test</span>          <span class="c"># for every job</span></pre>
+    <pre class="yml" style="font-size:19px; line-height:1.42; padding:16px 20px"><span class="k">jobs:</span>
+  <span class="k">test:</span>                         <span class="c"># job id = check name</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>      <span class="c"># WHERE</span>
+    <span class="k">steps:</span>                      <span class="c"># HOW, in order</span>
+      - <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
+      - <span class="k">uses:</span> <span class="v">actions/setup-node@v4</span>
+        <span class="k">with:</span>                   <span class="c"># inputs to the action</span>
+          <span class="k">node-version:</span> <span class="v">18</span>
+      - <span class="k">run:</span> <span class="v">npm install</span>        <span class="c"># a terminal command</span>
+      - <span class="k">name:</span> <span class="v">Run tests</span>         <span class="c"># label in the log</span>
+        <span class="k">run:</span> <span class="v">|</span>                  <span class="c"># several lines</span>
+<span class="v">          npm test</span>
+<span class="v">          echo "done"</span>
+
+  <span class="k">deploy:</span>
+    <span class="k">needs:</span> <span class="v">test</span>                 <span class="c"># waits for test ✓</span>
+    <span class="k">if:</span> <span class="v">github.ref == 'refs/heads/main'</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+    <span class="k">steps:</span>
+      - <span class="k">run:</span> <span class="v">echo "Deploying"</span></pre>
+  </div>
+  <p class="bottomline" style="font-size:26px">Indent = "belongs to". Every key lives in one of these spots.</p>
+  <aside class="notes">
+    <p><b>About 1 minute. A reference, not a lecture.</b> "Screenshot this or bookmark this slide. It's every key we used, plus a few you'll meet later." It's also in Code Lab 2 (Cheat sheet) to copy.</p>
+    <table style="border-collapse:collapse;margin:10px 0 6px">
+      <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">key</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">means</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">today?</th></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>name:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">the workflow's name in the Actions tab</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">WHEN: the events that start it. Any one is enough</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>branches: [dev]</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">short form of <code>- dev</code> on the next line</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">new form</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>schedule: - cron:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">on a timer, UTC</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">Lecture 1</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>workflow_dispatch:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">adds the Run workflow button</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>env:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">variables every step can read (<code>$NODE_ENV</code>)</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">extra</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>jobs: test:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">a job; its id is the check name on PRs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>runs-on:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">WHERE: the runner machine</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>steps:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">HOW: run top to bottom; one fails = job stops</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>uses:</code> + <code>with:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">a ready-made action + its inputs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>run: |</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">terminal commands, several lines</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">✅</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>needs: test</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">this job waits for test to pass</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">extra</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>if:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a">run only when true (here: on main)</td><td style="padding:4px 16px;border-bottom:1px solid #34405a">extra</td></tr>
+      </table>
+    <ul>
+      <li>Jobs run <b>at the same time</b> unless <code>needs:</code> says otherwise. Steps in a job run <b>in order</b>.</li>
+      <li>Checked: this exact file passes <b>actionlint</b> (the GitHub Actions linter) with no errors.</li>
+    </ul>
   </aside>
 </section>
 

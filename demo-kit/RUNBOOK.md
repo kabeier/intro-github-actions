@@ -60,6 +60,7 @@ No `schedule:` workflow is in the demo repo on purpose (it would run every night
 | 11 (29) | Deck + browser | workflow_dispatch; Run workflow / Re-run all jobs | "Re-run without junk commits." |
 | 12 (31) | Deck | Workflows are code | "Branch, PR, review." |
 | 13–14 (32–34) | Deck + your VS Code | Native vs Docker; push the Docker version | "Docker = how to run it; workflows = when." |
-| 15 (37) | Deck | Homework Part II | "Templates are on the class site." |
+| 15 (36) | Deck | Cheat sheet: a workflow file (reference) | "Screenshot this. It's in Code Lab 2 too." |
+| 16 (37) | Deck | Homework Part II | "Templates are on the class site." |
 
 **Time check, Lecture 2:** not at the activity by ~min 21 → skip the live fix in slide 7 (show the demo repo's green run). Not at slide 13 by ~min 34 → show the Docker slide only; students do it from Code Lab 2.
