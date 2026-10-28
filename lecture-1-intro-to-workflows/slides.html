@@ -203,6 +203,14 @@ code .</pre>
   <aside class="notes">
     <p><b>** LIVE, about 2 minutes. **</b> Your repo → <b>Actions</b> tab → "Hello World Workflow" → the run → the <b>say-hello</b> job → expand <b>Print a message</b>.</p>
     <p>A yellow dot = running, green ✓ = done. Students: thumbs up when they see their green ✓.</p>
+    <p><b>"Does on: match?"</b> On every push or PR, GitHub opens <b>every</b> file in <code>.github/workflows/</code> and asks: is this event listed under <code>on:</code>? If branches are listed, is it one of them? <b>Yes</b> → a runner runs the file. <b>No</b> → skipped, nothing in the Actions tab.</p>
+    <table style="border-collapse:collapse;margin:10px 0 6px">
+      <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a" align="left">the file says</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">push to main</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">push to feature</th></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on: push:</code> (slide 9)</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on: push: branches: - main</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on: pull_request:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td></tr>
+    </table>
+    <p>Say: "<code>on:</code> is the robot's alarm clock. GitHub checks every file's alarm, and only the files whose alarm matches what just happened wake up." The activity (slide 12) is this question 10 times; branches come on slide 13.</p>
   </aside>
 </section>
 
