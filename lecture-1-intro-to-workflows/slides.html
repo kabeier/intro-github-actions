@@ -367,6 +367,7 @@ git push -u origin try-filter</pre>
     <p><b>** CODE ALONG, about 5 minutes. **</b> Students do both pushes, then click the button. "No run" surprises people: that's the lesson.</p>
     <ul>
       <li>Step 1: <code>workflow_dispatch:</code> lines up with <code>push:</code> (2 spaces in). Nothing after the colon.</li>
+      <li><b>Watch for</b> (hit in the dry run): <code>workflow_dispatch:</code> indented 4 spaces, under <code>branches:</code>'s level. VS Code underlines it: it's now inside <code>push:</code>, and push has no such setting. Fix: back to 2 spaces, same as <code>push:</code>.</li>
       <li>Step 3: Actions tab → <b>Hello World Workflow</b> (left list) → <b>Run workflow</b> (right) → branch <b>main</b> → green <b>Run workflow</b>. The new run says <b>Manually triggered</b> instead of a commit message.</li>
       <li>No button? The push in step 1 didn't reach main, or the indent is wrong. Refresh the page after the push.</li>
     </ul>
