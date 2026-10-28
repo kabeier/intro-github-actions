@@ -136,7 +136,9 @@ git push -u origin main</code></pre><button type="button" class="copy">Copy</but
         <div class="cmdwrap"><pre class="cmd"><code>on:
   push:
     branches:
-      - main</code></pre><button type="button" class="copy">Copy</button></div>
+      - main
+  workflow_dispatch:</code></pre><button type="button" class="copy">Copy</button></div>
+        <code>workflow_dispatch:</code> lines up with <code>push:</code>, with nothing after the colon. It adds a <b>Run workflow</b> button.
         <div class="cmdwrap"><pre class="cmd"><code>git commit -am &quot;Only run on main&quot;
 git push</code></pre><button type="button" class="copy">Copy</button></div>
         Actions: a new run, for <b>main</b>.</li>
@@ -147,9 +149,10 @@ git add .
 git commit -m &quot;Change on a branch&quot;
 git push -u origin try-filter</code></pre><button type="button" class="copy">Copy</button></div>
         Actions: <b>no new run</b> for try-filter. That's correct: the filter said main only.</li>
+      <li>Start it by hand: Actions tab → <b>Hello World Workflow</b> (left list) → <b>Run workflow</b> → branch <b>main</b> → <b>Run workflow</b>. A new run appears, marked <b>Manually triggered</b>, with no push.</li>
       <li>Go back: <code>git checkout main</code>.</li>
     </ol>
-    <p class="note">The other triggers from the lecture: <code>pull_request: branches: - main</code> runs for pull requests <b>into</b> main; <code>schedule: - cron: "0 0 * * *"</code> runs daily at midnight UTC.</p>
+    <p class="note">The other triggers from the lecture: <code>pull_request: branches: - main</code> runs for pull requests <b>into</b> main; <code>schedule: - cron: "0 0 * * *"</code> runs daily at midnight UTC. You can list several triggers under the same <code>on:</code>; any one of them starts the workflow.</p>
   </section>
 
   <section>
@@ -157,6 +160,7 @@ git push -u origin try-filter</code></pre><button type="button" class="copy">Cop
     <ol class="steps">
       <li>Your repo's Actions tab shows a green ✓ "Hello World Workflow" run with "Hello from GitHub Actions!" in its output</li>
       <li>You pushed try-filter and saw that it did <b>not</b> run</li>
+      <li>You started a run by hand with <b>Run workflow</b></li>
     </ol>
   </section>
 
@@ -170,6 +174,7 @@ git push -u origin try-filter</code></pre><button type="button" class="copy">Cop
       <tr><td><code>remote origin already exists</code></td><td>You added the remote before</td><td><code>git remote set-url origin &lt;url&gt;</code></td></tr>
       <tr><td><code>src refspec main does not match any</code></td><td>Nothing committed yet</td><td><code>git add .</code> and <code>git commit</code> first</td></tr>
       <tr><td>The Actions tab is missing</td><td>Actions are turned off for the repo</td><td>Settings → Actions → General → Allow all actions</td></tr>
+      <tr><td>No <b>Run workflow</b> button</td><td><code>workflow_dispatch:</code> is missing, mis-indented, or not on main yet</td><td>Line it up with <code>push:</code>, push to main, refresh the page</td></tr>
     </table>
   </section>
 

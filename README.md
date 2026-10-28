@@ -5,7 +5,7 @@ Lecture site for Code Platoon Phase I, **Fundamentals: GitHub Actions**: workflo
 **Live site:** https://kabeier.github.io/intro-github-actions/
 **Demo repo (every run from the lessons, plus deliberate failures):** https://github.com/kabeier/gh-actions-demo
 
-## Lecture 1: Intro to Workflows (~40 min, 15 slides)
+## Lecture 1: Intro to Workflows (~40 min, 16 slides)
 
 - **Slides:** `lecture-1-intro-to-workflows/slides.html`
 - **Code lab:** `lecture-1-intro-to-workflows/code-lab/`

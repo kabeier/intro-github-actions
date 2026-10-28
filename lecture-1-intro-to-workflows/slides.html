@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="../shared/deck.css">
 <style>
   pre.yml { font-size: 23px; line-height: 1.45; padding: 20px 26px; }
-  pre.yml .k { color: #9fc3ff; } pre.yml .v { color: #ffd39f; } pre.yml .c { color: #8fa1bd; }
+  pre.yml .k { color: #9fc3ff; } pre.yml .v { color: #ffd39f; } pre.yml .c { color: #8fa1bd; } pre.yml .new { color: #ffe76a; font-weight: 700; }
   pre.log { font: 19px/1.45 var(--mono); background: #0d1117; color: #c9d1d9; padding: 18px 24px; border-radius: 10px; border: 1px solid #30363d; white-space: pre; overflow: hidden; }
   pre.log .h { color: #8b949e; } pre.log .ok { color: #3fb950; } pre.log .bad { color: #f85149; } pre.log .cmd { color: #79c0ff; }
   .cmdbox pre { font-size: 22px; padding: 16px 22px; }
   .tri { font-size: 21px !important; }
   .tri td, .tri th { vertical-align: top; }
-  .tri pre { font-size: 18px; padding: 10px 14px; margin: 0; background: #1b2230; }
+  .tri pre { font-size: 18px; padding: 10px 14px; margin: 0; background: #1b2230; white-space: pre; }
 </style>
 </head>
 <body data-minutes="40">
@@ -210,7 +210,7 @@ code .</pre>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on: push: branches: - main</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td></tr>
       <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap"><code>on: pull_request:</code></td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td></tr>
     </table>
-    <p>Say: "<code>on:</code> is the robot's alarm clock. GitHub checks every file's alarm, and only the files whose alarm matches what just happened wake up." The triggers table (slide 12) shows more, then the activity (slide 13) is this question 10 times.</p>
+    <p>Say: "<code>on:</code> is the robot's alarm clock. GitHub checks every file's alarm, and only the files whose alarm matches what just happened wake up." The triggers table (slide 12) and the by-hand button (slide 13) show more, then the activity (slide 14) is this question 10 times.</p>
   </aside>
 </section>
 
@@ -234,24 +234,51 @@ code .</pre>
   </aside>
 </section>
 
-<!-- ============ TRIGGERS (21–24) ============ -->
+<!-- ============ TRIGGERS (21–26) ============ -->
 <section class="slide" data-seg="Triggers" data-at="21">
   <h2><code>on:</code> decides when the robot works</h2>
+  <div class="cols" style="grid-template-columns:1.25fr 1fr; gap:40px; align-items:start">
   <table class="dbt tri">
-    <tr><th>You want…</th><th>on:</th><th>Typical use</th></tr>
-    <tr><td><b>only one branch</b></td><td><pre>on:
+    <tr><th>You want…</th><th>on:</th></tr>
+    <tr><td><b>only one branch</b><br><span class="muted">deploy only what's on main</span></td><td><pre>on:
   push:
     branches:
-      - main</pre></td><td>deploy only what's on main</td></tr>
-    <tr><td><b>check pull requests</b></td><td><pre>on:
+      - main</pre></td></tr>
+    <tr><td><b>check pull requests</b><br><span class="muted">test before anything merges into main</span></td><td><pre>on:
   pull_request:
     branches:
-      - main</pre></td><td>run tests before anything merges into main</td></tr>
-    <tr><td><b>on a timer</b></td><td><pre>on:
+      - main</pre></td></tr>
+    <tr><td><b>on a timer</b><br><span class="muted">every day at midnight <b>UTC</b></span></td><td><pre>on:
   schedule:
-    - cron: "0 0 * * *"</pre></td><td>every day at midnight <b>UTC</b></td></tr>
+    - cron: "0 0 * * *"</pre></td></tr>
   </table>
+  <div>
+    <p class="small" style="margin-bottom:10px"><b>All three in one file</b></p>
+    <pre class="yml"><span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span>
+      - <span class="v">main</span>
+  <span class="k">pull_request:</span>
+    <span class="k">branches:</span>
+      - <span class="v">main</span>
+  <span class="k">schedule:</span>
+    - <span class="k">cron:</span> <span class="v">"0 0 * * *"</span></pre>
+    <ul class="small" style="margin-top:14px">
+      <li>Each trigger is <b>one key under <code>on:</code></b>, same indent</li>
+      <li><b>Any one</b> of them starts the workflow</li>
+    </ul>
+  </div>
+  </div>
   <aside class="notes">
+    <p><b>Multiple triggers:</b> list them under the same <code>on:</code>, each one 2 spaces in. Each trigger keeps its <b>own</b> branch filter. It's <b>OR</b>, not AND:</p>
+    <table style="border-collapse:collapse;margin:10px 0 6px">
+      <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a" align="left">what happens</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">combined file</th></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">push to main</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs (push)</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">open a PR into main</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs (pull_request)</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">midnight UTC</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs (schedule)</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">push to dev, no PR</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ skipped</td></tr>
+    </table>
+    <p>Say: "Each line under <code>on:</code> is one more way to wake the robot up."</p>
     <ul>
       <li><code>pull_request: branches: main</code> = PRs whose <b>target</b> is main.</li>
       <li>Cron fields: minute hour day month weekday. <code>0 0 * * *</code> = 00:00 UTC daily (that's 7 or 8 pm Eastern the evening before).</li>
@@ -260,8 +287,44 @@ code .</pre>
   </aside>
 </section>
 
-<!-- ============ ACTIVITY (24–30), BRANCH FILTER (30–36) ============ -->
-<section class="slide activity" data-seg="Activity: Will it run?" data-at="24">
+<section class="slide" data-seg="Triggers: by hand" data-at="24">
+  <h2>Start it by hand: <code>workflow_dispatch</code></h2>
+  <div class="cols wide-left">
+    <div>
+      <pre class="yml"><span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span>
+      - <span class="v">main</span>
+  <span class="new">workflow_dispatch:</span>     <span class="c"># + a button</span></pre>
+      <p class="small" style="margin-top:16px">Actions tab → <b>Hello World Workflow</b> → <b>Run workflow</b> → pick a branch → <b>Run workflow</b></p>
+    </div>
+    <ul class="small">
+      <li><b>workflow_dispatch</b> = "can be started <b>by hand</b>"</li>
+      <li>It adds a <b>Run workflow</b> button</li>
+      <li>Nothing goes after the colon</li>
+      <li>The button shows once this file is on <b>main</b></li>
+      <li>Use it to run again <b>without</b> a new commit</li>
+    </ul>
+  </div>
+  <p class="bottomline">No workflow_dispatch = no button.</p>
+  <aside class="notes">
+    <p><b>About 2 minutes.</b> Just explain; students add it on slide 15.</p>
+    <ul>
+      <li>Say: "<b>dispatch</b> means send off. You send the robot off yourself, instead of waiting for a push."</li>
+      <li>It's one more trigger under <code>on:</code>, like on the last slide. Push to main still runs it; the button is a second way in.</li>
+      <li>The button only appears when the file with <code>workflow_dispatch</code> is on the <b>default branch</b> (main).</li>
+      <li>Without it, starting by hand fails: "Workflow does not have 'workflow_dispatch' trigger" (tested in kabeier/gh-actions-demo). Card 8 of the activity is this.</li>
+    </ul>
+    <table style="border-collapse:collapse;margin:10px 0 6px">
+      <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a" align="left"><code>on:</code> has…</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">push to main</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">click Run workflow</th></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">push only</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">❌ no button</td></tr>
+      <tr><td style="padding:4px 16px;border-bottom:1px solid #34405a">push + workflow_dispatch</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td><td style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap">✅ runs</td></tr>
+    </table>
+  </aside>
+</section>
+
+<!-- ============ ACTIVITY (26–32), BRANCH FILTER (32–37) ============ -->
+<section class="slide activity" data-seg="Activity: Will it run?" data-at="26">
   <h2>Activity: Will it run?</h2>
   <div class="countdown" data-sec="360"></div>
   <ol class="steps">
@@ -275,7 +338,7 @@ code .</pre>
   </aside>
 </section>
 
-<section class="slide" data-seg="Code along: a branch filter" data-at="30">
+<section class="slide" data-seg="Code along: a branch filter" data-at="32">
   <h2>Try it: a branch filter</h2>
   <div class="cols" style="gap:34px">
     <div>
@@ -283,7 +346,8 @@ code .</pre>
       <pre class="yml"><span class="k">on:</span>
   <span class="k">push:</span>
     <span class="k">branches:</span>
-      - <span class="v">main</span></pre>
+      - <span class="v">main</span>
+  <span class="new">workflow_dispatch:</span></pre>
       <pre style="font-size:19px; margin-top:12px; padding:12px 18px">git commit -am "Only run on main"
 git push</pre>
     </div>
@@ -295,16 +359,22 @@ git add .
 git commit -m "Change on a branch"
 git push -u origin try-filter</pre>
       <p class="small" style="margin-top:12px">Actions tab: a run for <b>main</b>, and <b>nothing</b> for try-filter.</p>
+      <p class="small" style="margin-top:12px"><b>3 · Click Run workflow</b> (branch: main) → a new run, <b>no push</b>.</p>
     </div>
   </div>
   <p class="bottomline">No run is the correct result: the filter said main only.</p>
   <aside class="notes">
-    <p><b>** CODE ALONG, about 5 minutes. **</b> Students do both pushes. "No run" surprises people: that's the lesson.</p>
+    <p><b>** CODE ALONG, about 5 minutes. **</b> Students do both pushes, then click the button. "No run" surprises people: that's the lesson.</p>
+    <ul>
+      <li>Step 1: <code>workflow_dispatch:</code> lines up with <code>push:</code> (2 spaces in). Nothing after the colon.</li>
+      <li>Step 3: Actions tab → <b>Hello World Workflow</b> (left list) → <b>Run workflow</b> (right) → branch <b>main</b> → green <b>Run workflow</b>. The new run says <b>Manually triggered</b> instead of a commit message.</li>
+      <li>No button? The push in step 1 didn't reach main, or the indent is wrong. Refresh the page after the push.</li>
+    </ul>
     <p>Then <code>git checkout main</code>.</p>
   </aside>
 </section>
 
-<section class="slide" data-seg="Wrap up" data-at="36">
+<section class="slide" data-seg="Wrap up" data-at="37">
   <h2>Homework, Part I: Hello Workflows</h2>
   <p class="small">A new repository with one workflow that:</p>
   <ol class="steps small">
