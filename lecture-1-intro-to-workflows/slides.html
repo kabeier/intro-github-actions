@@ -25,6 +25,7 @@
   <h1>Let a robot run your checks</h1>
   <p class="sub">GitHub Actions workflows: what they are, where they live, and your first one, running on GitHub.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Today we let a robot run our checks: what workflows are, and our first one running on GitHub.</p>
     <p><b>Before class</b> (demo-kit/RUNBOOK.md): logged in to GitHub in your browser. Tabs: this deck, <a href="https://github.com/kabeier/gh-actions-demo/actions">kabeier/gh-actions-demo → Actions</a> (backup: every run from the lessons, green and red), Code Lab 1.</p>
     <p>Press <b>T</b>. Students need: VS Code, a terminal, git, and to be <b>logged in to github.com</b>.</p>
   </aside>
@@ -38,6 +39,7 @@
     <li>Today: GitHub runs them for you, the same way, on every push</li>
   </ul>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Who ran the tests before they pushed? Today GitHub runs them for us.</p>
     <p>Ask chat: "Be honest: who pushed code this week without running the tests first?"</p>
     <p>"Teams don't trust memory. They automate it. That's Continuous Integration (CI)."</p>
   </aside>
@@ -59,6 +61,7 @@
   </div>
   <p class="bottomline">Forget a step in a workflow and it fails the same way.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A workflow is a recipe: the robot does only what you wrote, in order.</p>
     <p>Optional: play the first ~90 seconds of the video (it's in the curriculum).</p>
     <p>Plant the seed for Lecture 2: "forget to copy the code onto the robot's machine" is a real failure (the activity in Lecture 2).</p>
   </aside>
@@ -68,6 +71,7 @@
   <img src="../diagrams/GA1-01-event-to-steps.png" alt="Event, workflow, job, steps, output. A workflow is exact instructions for a robot. Event: you push code (on: push). Workflow: hello-world.yml (name:). Job: say-hello on ubuntu-latest (runs-on:). Steps: Print a message (run: echo). Output: Hello from GitHub Actions! and a green check. The YAML: name Hello World Workflow; on push; jobs say-hello runs-on ubuntu-latest; steps: a step named Print a message that runs echo. It lives in your repo at .github/workflows/hello-world.yml. One file is one workflow; a workflow has jobs; a job has steps. Like the exact-instructions sandwich challenge, the robot does only what you wrote, in order.">
   <div class="src">diagrams/GA1-01-event-to-steps.tldr</div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A picture of the chain: an event starts a workflow, which runs jobs and steps.</p>
     <p>"Event → Workflow → Job → Steps → Output. Point at each box, then at the line of YAML that makes it."</p>
     <ul>
       <li><b>Event:</b> what triggers it (a push, a pull request).</li>
@@ -96,6 +100,7 @@
   </div>
   <p class="bottomline">In professional teams, code is rarely merged without checks passing.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Why every team uses this.</p>
     <p>"Workflows are no longer optional. Employers expect you to read a red ✗ and fix it."</p>
     <p>Other common uses: linting/formatting, building Docker images, deploying after tests pass.</p>
   </aside>
@@ -113,6 +118,7 @@
   <p class="small muted" style="margin-top:10px; font-size:19px; max-width:none">We use the current versions (<b>@v7</b>). The curriculum shows @v4: both work.</p>
   <p class="bottomline">Reuse trusted actions. Pin the version (@v7), like you pin an image tag.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Don't write every step yourself: actions are ready-made pieces, like Docker images.</p>
     <p>Open the Marketplace for 30 seconds: search "setup-node", show the verified badge (like Docker's Official Image badge).</p>
     <p>"Same habit as Docker: official, maintained, pinned."</p>
   </aside>
@@ -137,6 +143,7 @@
   </div>
   <p class="bottomline">Wrong indentation = "Invalid workflow file". The robot can't even read it.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> The three YAML rules we need before writing a workflow.</p>
     <p>"Dockerfiles were one instruction per line. YAML is a tree: indentation is the structure."</p>
     <p>VS Code shows indentation guides. Two spaces per level is the convention.</p>
   </aside>
@@ -160,6 +167,7 @@ code .</pre>
     </div>
   </div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Everyone makes a hello-actions repo and the workflows folder.</p>
     <p><b>** YOUR TERMINAL, about 3 minutes. **</b> Do it live on your own machine.</p>
     <ul>
       <li>The <code>.github</code> folder is hidden in Finder: that's normal. VS Code shows it.</li>
@@ -192,6 +200,7 @@ code .</pre>
   </div>
   <pre style="font-size:19px; margin-top:16px; padding:12px 20px">git add .   ·   git commit -m "Add hello world workflow"   ·   git branch -M main   ·   git remote add origin https://github.com/YOUR-USERNAME/hello-actions.git   ·   git push -u origin main</pre>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> We write hello-world.yml, push it, and GitHub runs it.</p>
     <p><b>** CODE ALONG, about 5 minutes. **</b> Type the YAML in your real VS Code (students too), save, then commit and push (commands at the bottom; also in Code Lab 1).</p>
     <p>Read the breakdown line by line, it's the curriculum's. "This doesn't test anything yet: it proves the automation works."</p>
     <p><b>Watch for:</b> <code>remote origin already exists</code> → <code>git remote set-url origin &lt;url&gt;</code>. <code>src refspec main does not match any</code> → they didn't commit.</p>
@@ -202,6 +211,7 @@ code .</pre>
   <img src="../diagrams/GA1-02-what-happens.png" alt="What happens when you push. Your laptop runs git push. GitHub reads .github/workflows/*.yml and checks whether on: matches. A runner, a fresh ubuntu-latest virtual machine, runs each step in order and reports success with exit code 0 or failure with an exit code that isn't 0. The Actions tab: repo, Actions, the workflow, the run; job status, each step's output, errors. It's the feedback loop that makes CI worth it. Empty every time: the runner starts with nothing from your repo, no code until actions/checkout, no packages until npm install, like a fresh Docker container. One step fails, the job stops, and the run is a red X.">
   <div class="src">diagrams/GA1-02-what-happens.tldr</div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A picture of what happens on GitHub after a push.</p>
     <p><b>** LIVE, about 2 minutes. **</b> Your repo → <b>Actions</b> tab → "Hello World Workflow" → the run → the <b>say-hello</b> job → expand <b>Print a message</b>.</p>
     <p>A yellow dot = running, green ✓ = done. Students: thumbs up when they see their green ✓.</p>
     <p><b>"Does on: match?"</b> On every push or PR, GitHub opens <b>every</b> file in <code>.github/workflows/</code> and asks: is this event listed under <code>on:</code>? If branches are listed, is it one of them? <b>Yes</b> → a runner runs the file. <b>No</b> → skipped, nothing in the Actions tab.</p>
@@ -230,6 +240,7 @@ code .</pre>
   <p class="small muted" style="margin-top:14px">From the demo repo, kabeier/gh-actions-demo: this exact file, run on GitHub in 6 seconds.</p>
   <p class="bottomline">Every step: the command it ran, then what it printed.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> What a real run looks like in the Actions tab.</p>
     <p>If a student's run is slow or GitHub is busy, show this, or the demo repo's Actions tab.</p>
     <p>"Set up job" is GitHub preparing the fresh Ubuntu machine. "Complete job" cleans it up. The robot's machine is thrown away after every run.</p>
   </aside>
@@ -271,6 +282,7 @@ code .</pre>
   </div>
   </div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> The on: block decides when the robot works: branches and pull requests.</p>
     <p><b>Multiple triggers:</b> list them under the same <code>on:</code>, each one 2 spaces in. Each trigger keeps its <b>own</b> branch filter. It's <b>OR</b>, not AND:</p>
     <table style="border-collapse:collapse;margin:10px 0 6px">
       <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a" align="left">what happens</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">combined file</th></tr>
@@ -309,6 +321,7 @@ code .</pre>
   </div>
   <p class="bottomline">No workflow_dispatch = no button.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> We add a Run workflow button with workflow_dispatch.</p>
     <p><b>About 2 minutes.</b> Just explain; students add it on slide 15.</p>
     <ul>
       <li>Say: "<b>dispatch</b> means send off. You send the robot off yourself, instead of waiting for a push."</li>
@@ -335,6 +348,7 @@ code .</pre>
   </ol>
   <p class="muted small" style="margin-top:24px">Page: activity-will-it-run/</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Activity: you see an on: block and an event, and everyone says runs or doesn't run.</p>
     <p>About 30 seconds a card; the first 6 are the core set. Answers were checked on real runs in kabeier/gh-actions-demo (the midnight cron card is from GitHub's docs).</p>
   </aside>
 </section>
@@ -366,6 +380,7 @@ git push -u origin try-filter</pre>
   </div>
   <p class="bottomline">No run is the correct result: the filter said main only.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> We try a branch filter: push to main, then push another branch and see nothing run.</p>
     <p><b>** CODE ALONG, about 5 minutes. **</b> Students do both pushes, then click the button. "No run" surprises people: that's the lesson.</p>
     <ul>
       <li>Step 1: <code>workflow_dispatch:</code> lines up with <code>push:</code> (2 spaces in). Nothing after the colon.</li>
@@ -387,6 +402,7 @@ git push -u origin try-filter</pre>
   </ol>
   <p class="bottomline">Done = a green ✓ in your Actions tab, with "Hello Workflows" in the step's output.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Walk through Homework Part I: Hello Workflows.</p>
     <p>Full steps on the class site (Homework Part I). It's today's hello-world.yml with the trigger back to <code>on: push:</code> and a new message.</p>
   </aside>
 </section>

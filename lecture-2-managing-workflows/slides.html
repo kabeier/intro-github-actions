@@ -23,6 +23,7 @@
   <h1>Tests on every push</h1>
   <p class="sub">A workflow that runs your Jest suite on dev and on pull requests, by hand when you need it, and inside Docker.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Today the robot runs our Jest suite: on dev, on pull requests, by hand, and in Docker.</p>
     <p><b>Before class:</b> this deck open in Chrome with internet. Tabs: <a href="https://github.com/kabeier/gh-actions-demo/actions">kabeier/gh-actions-demo → Actions</a> (backup for every step, including a red run and PR #1), Code Lab 2.</p>
     <p>Press <b>T</b>. Students: a new GitHub repo <code>ci-factorial</code> (Public, no README), and <code>mkdir ci-factorial</code>, <code>cd ci-factorial</code>, <code>git init</code>, <code>code .</code></p>
   </aside>
@@ -36,6 +37,7 @@
     <li>Then: run it on demand, and run it in Docker</li>
   </ul>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Last time the robot said hello. Today it runs our tests.</p>
     <p>"This is the standard setup at most companies: nothing reaches main without the tests passing."</p>
   </aside>
 </section>
@@ -115,6 +117,7 @@ COPY . .
 CMD ["npm", "test"]</script>
   </div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> First we check everything works on the laptop, before we hand it to the robot.</p>
     <p><b>** CODE ALONG, about 5 minutes. **</b> Students paste the four files from <b>Code Lab 2</b> (the curriculum's project, word for word). The slide already has them.</p>
     <div class="typecode"><p class="th">TYPE THIS, in order</p>
     <p class="tf"><b>Ctrl+S</b>, then in the terminal:</p><pre>npm test
@@ -134,6 +137,7 @@ npm test</pre>
   <img src="../diagrams/GA2-01-run-tests-plain.png?v=2" alt="run-tests.yml in plain English. The YAML: on push to branch dev, and pull_request to branch main; jobs, test, runs-on ubuntu-latest; steps: uses actions/checkout@v7; uses actions/setup-node@v7 with node-version 18; run npm install; run npm install jest; run npm test or else echo Tests failed and exit 1. In plain English: when a push to dev or a PR into main; where a fresh Ubuntu machine; 1, copy this project; 2, set up Node 18; 3, install dependencies and Jest; 4, run the tests, where exit 1 means a red X. uses: is a ready-made action from the Marketplace; run: is a terminal command you write.">
   <div class="src">diagrams/GA2-01-run-tests-plain.tldr</div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A plain-English picture of what run-tests.yml will do.</p>
     <p>"In Ubuntu: copy this project, set up Node, install, run the tests." That's the curriculum's recipe, line for line.</p>
     <p>Mental model: <b>GitHub Actions is your local workflow, repeated in a clean environment.</b></p>
   </aside>
@@ -184,6 +188,7 @@ git push -u origin dev</pre>
     </div>
   </div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> We write run-tests.yml on a dev branch and push it.</p>
     <p><b>** CODE ALONG, about 5 minutes. **</b> New file <code>.github/workflows/run-tests.yml</code> (ci-factorial is a new repo, so this is its only workflow). Students copy from Code Lab 2; the YAML is the curriculum's, word for word.</p>
     <ul>
       <li><code>|</code> = "the next lines are one multi-line command".</li>
@@ -227,6 +232,7 @@ git push -u origin dev</pre>
     Tests:       7 passed, 7 total</pre>
   <p class="bottomline">The same PASS you saw on your laptop, from a machine you've never touched.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> The real log of a green run.</p>
     <p>From kabeier/gh-actions-demo (dev branch), 24 seconds.</p>
     <p><b>Students will ask about the yellow "npm warn EBADENGINE":</b> today's Jest prefers Node 20+, and this workflow pins Node 18. They're warnings; the run is green. Changing <code>node-version: 18</code> to <code>20</code> makes them go away (tested: branch example-node-20, zero warnings).</p>
   </aside>
@@ -264,6 +270,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </div>
   <p class="bottomline">Exit code 1 = red. Wednesday's exit codes are how GitHub knows.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> We break a test on purpose, push, and read the red X.</p>
     <p><b>** CODE ALONG, about 3 minutes. **</b> Everyone breaks it and pushes. Open the red run → the <b>test</b> job → the red <b>Run tests</b> step.</p>
     <p>Then fix it (<code>toBe(6)</code>), commit, push → green again. Real log from kabeier/gh-actions-demo.</p>
     <p><b>Demo repo vs students:</b> kabeier/gh-actions-demo also has hello-world.yml, so its Actions tab shows a Hello World run too. Students' <b>ci-factorial</b> is a separate repo with only Run Test Suite.</p>
@@ -281,6 +288,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </ol>
   <p class="muted small" style="margin-top:24px">Page: activity-read-the-red-x/</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Activity: a failed run's log appears, and everyone says what failed.</p>
     <p>Every log on the cards came from a real failed run in kabeier/gh-actions-demo (branches example-broken-yaml, example-no-checkout, example-no-jest).</p>
   </aside>
 </section>
@@ -290,6 +298,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   <img src="../diagrams/GA2-02-dev-pr-main.png?v=2" alt="Work on dev, prove it, then merge to main. dev (git push origin dev), then open a pull request dev into main where checks run, then merge into main after a green check. A push to dev runs Run Test Suite. The pull_request into main runs Run Test Suite, shown on the PR. The merge is a push to main: Run Test Suite does not run, because its push trigger is dev-only. A red X on the PR only warns: you can still merge. Next slide: a branch rule that blocks it.">
   <div class="src">diagrams/GA2-02-dev-pr-main.tldr</div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A picture of the flow: dev, pull request, then main.</p>
     <p><b>** LIVE, about 3 minutes. **</b> github.com → your repo → <b>Compare &amp; pull request</b> (dev → main) → the checks appear at the bottom of the PR. Wait for ✓, then <b>Merge</b>.</p>
     <p>Backup: <a href="https://github.com/kabeier/gh-actions-demo/pull/1">kabeier/gh-actions-demo PR #1</a>.</p>
     <p>Students' ci-factorial has only Run Test Suite. The demo repo backup also shows Hello World runs (it has both files).</p>
@@ -326,6 +335,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </div>
   <p class="bottomline">The workflow reports. A branch rule enforces.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A red X only warns. A branch rule is what blocks the merge.</p>
     <p><b>About 2 minutes.</b> Explain; don't do it live (it's an extra in Code Lab 2).</p>
     <ul>
       <li>Say: "Everything we built today <b>warns</b>. GitHub shows the red ✗ on the PR, but the Merge button still works. Teams add a <b>branch rule</b> so red can't be merged."</li>
@@ -364,6 +374,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </div>
   <p class="bottomline">Without it, GitHub refuses: "Workflow does not have 'workflow_dispatch' trigger".</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> We add a button to run the workflow again without a new commit.</p>
     <ul>
       <li>Recap: students added <code>workflow_dispatch</code> to hello-world.yml in Lecture 1 (slides 13 and 15). New here: using it on the real test workflow, and <b>Re-run all jobs</b>.</li>
       <li>The <b>Run workflow</b> button appears once the workflow with <code>workflow_dispatch</code> is on the default branch (main). Merge first, then show it.</li>
@@ -381,6 +392,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </ul>
   <p class="bottomline">A broken workflow can let broken code through. Review it like code.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Workflows are code: branch, review and test them like anything else.</p>
     <p>"History lets you see how the pipeline evolved, and revert it if a change breaks CI."</p>
   </aside>
 </section>
@@ -390,6 +402,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   <img src="../diagrams/GA2-03-native-vs-docker.png" alt="Two ways to run the same tests in CI. Docker answers how do I run my app the same everywhere; workflows answer when should checks run. Native: actions/checkout, actions/setup-node with Node 18, npm install, npm install jest, npm test; faster, simpler, no Dockerfile needed. Docker: actions/checkout, docker build -t app-test, docker run app-test, and the Dockerfile does the rest; the same image as production, works here equals works everywhere. Pick native for a small project, fast feedback, when Docker isn't needed to test. Pick Docker when environment parity matters, there are native dependencies, or production runs in containers. Either way the verdict is the exit code: 0 is a check, anything else is an X.">
   <div class="src">diagrams/GA2-03-native-vs-docker.tldr</div>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A picture comparing running tests directly vs in Docker.</p>
     <p>The curriculum's table: native = small projects, build time matters, fast feedback, Docker not needed. Docker = environment parity critical, native dependencies, production in containers, "works here == works everywhere".</p>
   </aside>
 </section>
@@ -430,6 +443,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </div>
   <p class="small muted" style="margin-top:10px; font-size:19px; max-width:none">We use the current versions (<b>@v7</b>). The curriculum shows @v4: both work.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> The same workflow, using Docker.</p>
     <p><b>** CODE ALONG or YOUR DEMO, about 3 minutes. **</b> Replace run-tests.yml with this (the curriculum's), push to dev. The runner already has Docker. Same 7 passed, ~30 seconds.</p>
     <p>No setup-node step: the Dockerfile's <code>FROM node:18-alpine</code> brings Node. Real run in kabeier/gh-actions-demo.</p>
   </aside>
@@ -475,6 +489,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </div>
   <p class="bottomline" style="font-size:26px">Indent = "belongs to". Every key lives in one of these spots.</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> A cheat sheet of a whole workflow file.</p>
     <p><b>About 1 minute. A reference, not a lecture.</b> "Screenshot this or bookmark this slide. It's every key we used, plus a few you'll meet later." It's also in Code Lab 2 (Cheat sheet) to copy.</p>
     <table style="border-collapse:collapse;margin:10px 0 6px">
       <tr><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">key</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">means</th><th style="padding:4px 16px;border-bottom:1px solid #34405a;white-space:nowrap" align="left">today?</th></tr>
@@ -508,6 +523,7 @@ Tests:       <span class="bad">1 failed</span>, <span class="ok">6 passed</span>
   </ul>
   <p class="bottomline">Templates are on the class site. Done = a green ✓ on each repo (red until the tests pass is OK).</p>
   <aside class="notes">
+    <p class="plan"><b>The plan:</b> Walk through Homework Part II: add workflows to your earlier assignments.</p>
     <p>Both templates ran green in kabeier/gh-actions-demo (branches template-jest, template-pytest).</p>
     <p>The earlier JS/Python week specs only print true/false and always exit 0, so a workflow can't fail on them. Use the pytest/Jest repos.</p>
   </aside>
